@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transaction Forensics — Enterprise Pattern Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sf-blue: #0176D3;
+  --sf-blue-dark: #014486;
+  --sf-blue-light: #E8F4FD;
+  --sf-nav: #032D60;
+  --bg: #F4F6F9;
+  --bg-card: #FFFFFF;
+  --text: #181818;
+  --text-secondary: #444746;
+  --text-muted: #706E6B;
+  --border: #E5E5E5;
+  --border-light: #F0F0F0;
+  --critical: #C23934;
+  --critical-bg: #FEF1EE;
+  --high: #E87722;
+  --high-bg: #FFF4EC;
+  --medium: #CA8D04;
+  --medium-bg: #FFF9E6;
+  --low: #2E844A;
+  --low-bg: #EEF6F0;
+  --font: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --mono: 'IBM Plex Mono', monospace;
+  --radius: 8px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; line-height: 1.5; }
+.header { background: var(--sf-nav); color: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.header-inner { max-width: 1600px; margin: 0 auto; padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; }
+.header-brand { display: flex; align-items: center; gap: 12px; }
+.header-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--sf-blue), #49B6FF); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; }
+.header-title { font-size: 18px; font-weight: 700; }
+.header-subtitle { font-size: 11px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1.5px; }
+.header-meta { display: flex; gap: 24px; align-items: center; }
+.header-stat { text-align: right; }
+.header-stat-value { font-size: 15px; font-weight: 700; font-family: var(--mono); }
+.header-stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5; }
+.header-export { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 6px; font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; }
+.header-export:hover { background: rgba(255,255,255,0.2); }
+.severity-bar { max-width: 1600px; margin: 0 auto; padding: 16px 32px; display: flex; gap: 12px; }
+.severity-pill { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); cursor: pointer; flex: 1; transition: all 0.15s; }
+.severity-pill:hover { box-shadow: var(--shadow-md); }
+.severity-dot { width: 10px; height: 10px; border-radius: 50%; }
+.severity-pill-count { font-size: 20px; font-weight: 800; font-family: var(--mono); }
+.severity-pill-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.filters { max-width: 1600px; margin: 0 auto; padding: 0 32px 16px; display: flex; gap: 12px; align-items: center; }
+.filter-select, .filter-input { font-family: var(--font); font-size: 13px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); color: var(--text); outline: none; }
+.filter-select:focus, .filter-input:focus { border-color: var(--sf-blue); }
+.filter-input { flex: 1; max-width: 300px; }
+.filter-clear { font-family: var(--font); font-size: 12px; color: var(--sf-blue); background: none; border: none; cursor: pointer; padding: 8px; }
+.main { max-width: 1600px; margin: 0 auto; padding: 0 32px 32px; display: grid; grid-template-columns: 1fr; gap: 16px; transition: all 0.3s; }
+.main.has-detail { grid-template-columns: 1fr 480px; }
+.cards-grid { display: grid; gap: 12px; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; animation: fadeUp 0.3s ease-out backwards; }
+.card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+.card[data-severity="critical"]::before { background: var(--critical); }
+.card[data-severity="high"]::before { background: var(--high); }
+.card[data-severity="medium"]::before { background: var(--medium); }
+.card[data-severity="low"]::before { background: var(--low); }
+.card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.card.selected { border-color: var(--sf-blue); box-shadow: 0 0 0 1px var(--sf-blue); }
+.card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.card-badges { display: flex; gap: 6px; flex-shrink: 0; }
+.badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 3px 8px; border-radius: 4px; }
+.badge-critical { background: var(--critical-bg); color: var(--critical); }
+.badge-high { background: var(--high-bg); color: var(--high); }
+.badge-medium { background: var(--medium-bg); color: var(--medium); }
+.badge-low { background: var(--low-bg); color: var(--low); }
+.badge-type { background: #F0EDFF; color: #9050E9; }
+.badge-type[data-type="bottleneck"] { background: var(--sf-blue-light); color: var(--sf-blue); }
+.badge-type[data-type="compliance"] { background: var(--critical-bg); color: var(--critical); }
+.badge-type[data-type="communication"] { background: var(--low-bg); color: #3BA755; }
+.badge-type[data-type="approval"] { background: var(--high-bg); color: var(--high); }
+.badge-type[data-type="escalation"] { background: #FDE8F3; color: #DD2590; }
+.card-title { font-size: 15px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
+.card-desc { font-size: 13px; color: var(--text-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-light); }
+.card-phrases { display: flex; gap: 4px; flex-wrap: wrap; }
+.phrase-tag { font-size: 11px; font-family: var(--mono); padding: 2px 8px; background: #F4F6F9; border-radius: 3px; color: var(--text-muted); }
+.card-confidence { display: flex; align-items: center; gap: 6px; }
+.confidence-bar-bg { width: 48px; height: 4px; background: var(--border-light); border-radius: 2px; overflow: hidden; }
+.confidence-bar-fill { height: 100%; border-radius: 2px; }
+.confidence-label { font-size: 11px; font-family: var(--mono); font-weight: 500; color: var(--text-muted); }
+.card-id { font-size: 10px; font-family: var(--mono); color: var(--text-muted); opacity: 0.6; }
+.detail-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow-y: auto; max-height: calc(100vh - 180px); position: sticky; top: 100px; box-shadow: var(--shadow-md); animation: slideIn 0.25s ease-out; }
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.detail-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; position: sticky; top: 0; background: var(--bg-card); z-index: 1; }
+.detail-close { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; padding: 4px 8px; border-radius: 4px; line-height: 1; }
+.detail-close:hover { background: var(--bg); }
+.detail-body { padding: 20px 24px; }
+.detail-section { margin-bottom: 20px; }
+.detail-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
+.detail-description { font-size: 14px; line-height: 1.65; color: var(--text-secondary); }
+.detail-impact { background: var(--sf-blue-light); border-left: 3px solid var(--sf-blue); padding: 12px 16px; border-radius: 0 6px 6px 0; font-size: 13px; color: var(--sf-blue-dark); }
+.detail-recommendation { background: var(--low-bg); border-left: 3px solid var(--low); padding: 12px 16px; border-radius: 0 6px 6px 0; font-size: 13px; color: #1B5E20; }
+.detail-caveat { font-size: 12px; color: var(--text-muted); font-style: italic; padding: 8px 0; }
+.evidence-msg { background: var(--bg); border-radius: 8px; padding: 12px 16px 12px 32px; margin-bottom: 8px; font-size: 13px; color: var(--text-secondary); position: relative; border-left: 3px solid var(--border); }
+.evidence-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.meta-badge { font-size: 11px; padding: 3px 10px; border-radius: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text-secondary); }
+.meta-badge-product { background: var(--sf-blue-light); border-color: #B4D6F0; color: var(--sf-blue-dark); }
+.meta-badge-team { background: #F0EDFF; border-color: #D4CCFF; color: #9050E9; }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.empty-state-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+.footer { max-width: 1600px; margin: 0 auto; padding: 16px 32px 32px; display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); }
+.footer a { color: var(--sf-blue); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+.card:nth-child(1) { animation-delay: 0.02s; }
+.card:nth-child(2) { animation-delay: 0.04s; }
+.card:nth-child(3) { animation-delay: 0.06s; }
+.card:nth-child(4) { animation-delay: 0.08s; }
+.card:nth-child(5) { animation-delay: 0.10s; }
+.card:nth-child(6) { animation-delay: 0.12s; }
+@media (max-width: 1024px) { .main.has-detail { grid-template-columns: 1fr; } .detail-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 480px; max-height: 100vh; z-index: 200; border-radius: 0; } }
+@media (max-width: 768px) { .header-inner { padding: 12px 16px; flex-wrap: wrap; gap: 8px; } .header-meta { display: none; } .severity-bar, .filters, .main, .footer { padding-left: 16px; padding-right: 16px; } .severity-bar { flex-wrap: wrap; } .detail-panel { width: 100%; } }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-icon">TF</div>
+      <div>
+        <div class="header-title">Transaction Forensics</div>
+        <div class="header-subtitle">Enterprise Pattern Analysis</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="header-stat"><div class="header-stat-value" id="stat-source">—</div><div class="header-stat-label">Data Source</div></div>
+      <div class="header-stat"><div class="header-stat-value" id="stat-messages">—</div><div class="header-stat-label">Messages Scanned</div></div>
+      <div class="header-stat"><div class="header-stat-value" id="stat-products">—</div><div class="header-stat-label">Products Analyzed</div></div>
+      <button class="header-export" id="btn-export">Export JSON ↓</button>
+    </div>
+  </div>
+</header>
+
+<div class="severity-bar" id="severity-bar"></div>
+
+<div class="filters">
+  <select class="filter-select" id="filter-type">
+    <option value="">All Types</option>
+    <option value="anomaly">Anomaly</option>
+    <option value="bottleneck">Bottleneck</option>
+    <option value="compliance">Compliance</option>
+    <option value="communication">Communication</option>
+    <option value="approval">Approval</option>
+    <option value="escalation">Escalation</option>
+  </select>
+  <select class="filter-select" id="filter-severity">
+    <option value="">All Severities</option>
+    <option value="critical">Critical</option>
+    <option value="high">High</option>
+    <option value="medium">Medium</option>
+    <option value="low">Low</option>
+  </select>
+  <input class="filter-input" id="filter-search" type="text" placeholder="Search patterns, phrases, products...">
+  <button class="filter-clear" id="filter-clear">Clear filters</button>
+</div>
+
+<div class="main" id="main-container">
+  <div class="cards-grid" id="cards-grid">
+    <div class="empty-state"><div class="empty-state-icon">⏳</div><p>Loading forensic analysis...</p></div>
+  </div>
+</div>
+
+<!-- ═══ PIPELINE TAB ═══ -->
+<div id="pipeline-section" style="max-width:1600px;margin:0 auto;padding:0 32px 16px">
+  <div style="border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);overflow:hidden">
+    <button id="pipeline-toggle" style="width:100%;padding:14px 24px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-family:var(--font);font-size:14px;font-weight:700;color:var(--text)">
+      <span>▸ Pipeline Transparency — How These Patterns Were Computed</span>
+      <span style="font-size:11px;color:var(--text-muted);font-weight:400">Click to expand</span>
+    </button>
+    <div id="pipeline-body" style="display:none;padding:0 24px 24px;border-top:1px solid var(--border)">
+      <div id="pipeline-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SALESFORCE CONNECT ═══ -->
+<div style="max-width:1600px;margin:0 auto;padding:0 32px 16px">
+  <div style="border:1px solid #B4D6F0;border-radius:var(--radius);background:var(--sf-blue-light);padding:20px 24px;display:flex;align-items:center;gap:16px">
+    <div style="width:40px;height:40px;background:linear-gradient(135deg,#0176D3,#49B6FF);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;flex-shrink:0">SF</div>
+    <div style="flex:1">
+      <div style="font-size:14px;font-weight:700;color:var(--sf-blue-dark)">Connect Your Own Salesforce Org</div>
+      <div style="font-size:12px;color:var(--sf-blue-dark);opacity:0.7;margin-top:2px">Export your org's Slack data, case comments, or approval histories as CSV — drop them into the pattern engine and get your own forensics report. Works with any CRM data that has text fields and timestamps.</div>
+    </div>
+    <a href="https://github.com/chrbailey" target="_blank" style="padding:8px 16px;background:var(--sf-blue);color:white;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap">View on GitHub →</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div>
+    <strong>Christopher Bailey</strong> · Pattern Engine v1.0 · Data: <a href="https://huggingface.co/datasets/Salesforce/HERB" target="_blank">Salesforce/HERB (HuggingFace)</a>
+    · Pipeline: Python + scikit-learn (TF-IDF + KMeans)
+  </div>
+  <div>Stanford TECH 41 — Building AI Products Through Rapid Prototyping · March 2026</div>
+</footer>
+
+<script>
+// Safe text escaping
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+
+// Fallback data
+const FALLBACK_DATA = {
+  metadata: { generated_at: new Date().toISOString(), source: "Salesforce/HERB", products_analyzed: ["ActionGenie","AnomalyForce","SupportForce"], total_messages_scanned: 3252, total_documents_scanned: 45 },
+  cards: [
+    { id:"PAT-001", title:"VP Approval Bottleneck in Product Planning", description:"43% of planning decisions require VP-level sign-off, creating a 3.2 day average delay. Engineering leads have authority to approve but consistently defer upward.", type:"bottleneck", confidence:"HIGH", confidence_score:0.88, severity:"high", top_phrases:["waiting on VP","need approval","escalate to Hannah"], occurrence:"Found in 18 of 45 meeting transcripts", effect:"Average 3.2 day delay per planning decision. Estimated 2-week slip per quarter.", evidence:{ source_count:18, sample_messages:["Can you approve the Q3 roadmap changes? We have been waiting since Tuesday","Blocked on VP approval for the new feature spec"], affected_products:["ActionGenie","AnomalyForce"], affected_teams:["Engineering","Product"], time_range:"2026-06-09 to 2026-07-15" }, sample_snippets:["Blocked on VP approval for the new feature spec"], caveats:"Some delays may be intentional governance for high-risk decisions", recommendation:"Implement tiered approval: engineering leads approve features under $50K impact, VP approval only for strategic pivots." },
+    { id:"PAT-002", title:"Customer Escalation Pattern — BlueWave Account", description:"BlueWave (CUST-0001) has generated 3x more support interactions than average, concentrated around product integration issues.", type:"escalation", confidence:"HIGH", confidence_score:0.92, severity:"critical", top_phrases:["BlueWave","integration issue","Frank Lewis"], occurrence:"Found across 3 product channels", effect:"Risk of churn for top-tier account. Frank Lewis increasingly frustrated.", evidence:{ source_count:12, sample_messages:["Frank from BlueWave pinged again about the API timeout — third time this week","Has anyone responded to BlueWave integration ticket? It has been 4 days"], affected_products:["ConnectForce","ActionGenie"], affected_teams:["Engineering","Support","Product"], time_range:"2026-06-15 to 2026-07-10" }, sample_snippets:["This is the third time this week","4 days with no response"], caveats:"High volume may reflect complex deployment", recommendation:"Assign dedicated TAM for BlueWave. Implement SLA tracking for enterprise accounts." },
+    { id:"PAT-003", title:"Sensitive Customer Data in Public Slack Channels", description:"Customer names, company details, and ticket specifics shared in non-restricted channels. 7 instances of customer PII found.", type:"compliance", confidence:"MEDIUM", confidence_score:0.75, severity:"critical", top_phrases:["customer data","shared in channel","should this be private"], occurrence:"7 instances across 3 products", effect:"Potential GDPR/CCPA exposure. Customer trust risk if data handling practices audited.", evidence:{ source_count:7, sample_messages:["Just got off call with TechCorp CTO Tom Nelson — he wants enterprise tier pricing by Friday","CloudSync Bob Roberts sent production database credentials in the support ticket"], affected_products:["SupportForce","ConnectForce","EdgeForce"], affected_teams:["Support","Sales","Engineering"], time_range:"2026-06-09 to 2026-07-15" }, sample_snippets:["Customer sent production credentials in support ticket"], caveats:"Channel access settings may limit actual exposure", recommendation:"Implement Slack DLP rules. Create private customer-sensitive channel. Train team on data handling." }
+  ]
+};
+
+let data = null, selectedId = null, filters = { type:'', severity:'', search:'' };
+
+async function loadData() {
+  try { const r = await fetch('pattern_cards.json'); if (r.ok) data = await r.json(); else data = FALLBACK_DATA; } catch { data = FALLBACK_DATA; }
+  renderAll();
+}
+
+function renderAll() { renderMeta(); renderSeverityBar(); renderCards(); }
+
+function renderMeta() {
+  const m = data.metadata;
+  document.getElementById('stat-source').textContent = m.source || 'Local';
+  document.getElementById('stat-messages').textContent = (m.total_messages_scanned || 0).toLocaleString();
+  document.getElementById('stat-products').textContent = (m.products_analyzed || []).length;
+}
+
+function renderSeverityBar() {
+  const c = { total:0, critical:0, high:0, medium:0, low:0 };
+  data.cards.forEach(d => { c.total++; c[d.severity]=(c[d.severity]||0)+1; });
+  const bar = document.getElementById('severity-bar');
+  while (bar.firstChild) bar.removeChild(bar.firstChild);
+  [['total',c.total,'Total','#032D60'],['critical',c.critical,'Critical','var(--critical)'],['high',c.high,'High','var(--high)'],['medium',c.medium,'Medium','var(--medium)'],['low',c.low,'Low','var(--low)']].forEach(([key,count,label,color]) => {
+    const pill = document.createElement('div');
+    pill.className = 'severity-pill';
+    pill.dataset.filter = key;
+    const dot = document.createElement('div');
+    dot.className = 'severity-dot';
+    dot.style.background = color;
+    const inner = document.createElement('div');
+    const countEl = document.createElement('div');
+    countEl.className = 'severity-pill-count';
+    countEl.textContent = count;
+    const labelEl = document.createElement('div');
+    labelEl.className = 'severity-pill-label';
+    labelEl.textContent = label;
+    inner.appendChild(countEl);
+    inner.appendChild(labelEl);
+    pill.appendChild(dot);
+    pill.appendChild(inner);
+    pill.addEventListener('click', () => {
+      if (key === 'total') { filters.severity = ''; document.getElementById('filter-severity').value = ''; }
+      else { filters.severity = filters.severity === key ? '' : key; document.getElementById('filter-severity').value = filters.severity; }
+      renderCards(); renderSeverityBar();
+    });
+    bar.appendChild(pill);
+  });
+}
+
+function getFiltered() {
+  return data.cards.filter(c => {
+    if (filters.type && c.type !== filters.type) return false;
+    if (filters.severity && c.severity !== filters.severity) return false;
+    if (filters.search) {
+      const q = filters.search.toLowerCase();
+      const h = [c.title, c.description, c.id, ...(c.top_phrases||[]), ...(c.evidence?.affected_products||[]), ...(c.evidence?.affected_teams||[])].join(' ').toLowerCase();
+      if (!h.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function confColor(s) { return s >= 0.8 ? 'var(--low)' : s >= 0.6 ? 'var(--medium)' : 'var(--critical)'; }
+
+function renderCards() {
+  const filtered = getFiltered();
+  const grid = document.getElementById('cards-grid');
+  while (grid.firstChild) grid.removeChild(grid.firstChild);
+  if (filtered.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = 'No patterns match your filters';
+    grid.appendChild(empty);
+    return;
+  }
+  filtered.forEach((c, i) => {
+    const card = document.createElement('div');
+    card.className = 'card' + (selectedId === c.id ? ' selected' : '');
+    card.dataset.severity = c.severity;
+    card.style.animationDelay = (i * 0.02) + 's';
+    card.addEventListener('click', () => selectCard(c.id));
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'card-header';
+    const titleWrap = document.createElement('div');
+    const title = document.createElement('div');
+    title.className = 'card-title';
+    title.textContent = c.title;
+    const desc = document.createElement('div');
+    desc.className = 'card-desc';
+    desc.textContent = c.description;
+    titleWrap.appendChild(title);
+    titleWrap.appendChild(desc);
+    const badges = document.createElement('div');
+    badges.className = 'card-badges';
+    const sevBadge = document.createElement('span');
+    sevBadge.className = 'badge badge-' + c.severity;
+    sevBadge.textContent = c.severity;
+    const typeBadge = document.createElement('span');
+    typeBadge.className = 'badge badge-type';
+    typeBadge.dataset.type = c.type;
+    typeBadge.textContent = c.type;
+    badges.appendChild(sevBadge);
+    badges.appendChild(typeBadge);
+    header.appendChild(titleWrap);
+    header.appendChild(badges);
+
+    // Footer
+    const footer = document.createElement('div');
+    footer.className = 'card-footer';
+    const phrases = document.createElement('div');
+    phrases.className = 'card-phrases';
+    (c.top_phrases || []).slice(0, 3).forEach(p => {
+      const tag = document.createElement('span');
+      tag.className = 'phrase-tag';
+      tag.textContent = p;
+      phrases.appendChild(tag);
+    });
+    const confWrap = document.createElement('div');
+    confWrap.className = 'card-confidence';
+    const idEl = document.createElement('span');
+    idEl.className = 'card-id';
+    idEl.textContent = c.id;
+    const barBg = document.createElement('div');
+    barBg.className = 'confidence-bar-bg';
+    const barFill = document.createElement('div');
+    barFill.className = 'confidence-bar-fill';
+    barFill.style.width = ((c.confidence_score || 0.5) * 100) + '%';
+    barFill.style.background = confColor(c.confidence_score);
+    barBg.appendChild(barFill);
+    const confLabel = document.createElement('span');
+    confLabel.className = 'confidence-label';
+    confLabel.textContent = Math.round((c.confidence_score || 0.5) * 100) + '%';
+    confWrap.appendChild(idEl);
+    confWrap.appendChild(barBg);
+    confWrap.appendChild(confLabel);
+    footer.appendChild(phrases);
+    footer.appendChild(confWrap);
+
+    card.appendChild(header);
+    card.appendChild(footer);
+    grid.appendChild(card);
+  });
+}
+
+function selectCard(id) {
+  selectedId = selectedId === id ? null : id;
+  const main = document.getElementById('main-container');
+  if (!selectedId) {
+    main.classList.remove('has-detail');
+    const p = document.getElementById('detail-panel');
+    if (p) p.remove();
+    renderCards();
+    return;
+  }
+  const card = data.cards.find(c => c.id === id);
+  if (!card) return;
+  main.classList.add('has-detail');
+  renderCards();
+
+  let panel = document.getElementById('detail-panel');
+  if (!panel) { panel = document.createElement('div'); panel.id = 'detail-panel'; panel.className = 'detail-panel'; main.appendChild(panel); }
+  while (panel.firstChild) panel.removeChild(panel.firstChild);
+
+  const ev = card.evidence || {};
+
+  // Build detail DOM safely
+  const dHeader = document.createElement('div');
+  dHeader.className = 'detail-header';
+  const dHeaderLeft = document.createElement('div');
+  const dBadges = document.createElement('div');
+  dBadges.style.cssText = 'display:flex;gap:6px;margin-bottom:8px';
+  const sb = document.createElement('span'); sb.className = 'badge badge-' + card.severity; sb.textContent = card.severity;
+  const tb = document.createElement('span'); tb.className = 'badge badge-type'; tb.dataset.type = card.type; tb.textContent = card.type;
+  dBadges.appendChild(sb); dBadges.appendChild(tb);
+  const dTitle = document.createElement('div');
+  dTitle.style.cssText = 'font-size:17px;font-weight:700;line-height:1.3';
+  dTitle.textContent = card.title;
+  const dMeta = document.createElement('div');
+  dMeta.style.cssText = 'font-size:11px;font-family:var(--mono);color:var(--text-muted);margin-top:4px';
+  dMeta.textContent = card.id + ' · ' + (card.occurrence || '');
+  dHeaderLeft.appendChild(dBadges); dHeaderLeft.appendChild(dTitle); dHeaderLeft.appendChild(dMeta);
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'detail-close';
+  closeBtn.textContent = '×';
+  closeBtn.addEventListener('click', () => selectCard(null));
+  dHeader.appendChild(dHeaderLeft); dHeader.appendChild(closeBtn);
+  panel.appendChild(dHeader);
+
+  const body = document.createElement('div');
+  body.className = 'detail-body';
+
+  // Description
+  const descSec = document.createElement('div'); descSec.className = 'detail-section';
+  const descTitle = document.createElement('div'); descTitle.className = 'detail-section-title'; descTitle.textContent = 'Description';
+  const descText = document.createElement('div'); descText.className = 'detail-description'; descText.textContent = card.description;
+  descSec.appendChild(descTitle); descSec.appendChild(descText); body.appendChild(descSec);
+
+  // Impact
+  if (card.effect) {
+    const impSec = document.createElement('div'); impSec.className = 'detail-section';
+    const impTitle = document.createElement('div'); impTitle.className = 'detail-section-title'; impTitle.textContent = 'Business Impact';
+    const impBox = document.createElement('div'); impBox.className = 'detail-impact'; impBox.textContent = card.effect;
+    impSec.appendChild(impTitle); impSec.appendChild(impBox); body.appendChild(impSec);
+  }
+
+  // Evidence messages
+  if ((ev.sample_messages || []).length > 0) {
+    const evSec = document.createElement('div'); evSec.className = 'detail-section';
+    const evTitle = document.createElement('div'); evTitle.className = 'detail-section-title';
+    evTitle.textContent = 'Evidence — ' + (ev.source_count || '?') + ' sources' + (ev.time_range ? ' · ' + ev.time_range : '');
+    evSec.appendChild(evTitle);
+    ev.sample_messages.forEach(m => {
+      const msg = document.createElement('div'); msg.className = 'evidence-msg'; msg.textContent = m;
+      evSec.appendChild(msg);
+    });
+    body.appendChild(evSec);
+  }
+
+  // Scope
+  if (ev.affected_products || ev.affected_teams) {
+    const scopeSec = document.createElement('div'); scopeSec.className = 'detail-section';
+    const scopeTitle = document.createElement('div'); scopeTitle.className = 'detail-section-title'; scopeTitle.textContent = 'Scope';
+    const scopeMeta = document.createElement('div'); scopeMeta.className = 'evidence-meta';
+    (ev.affected_products || []).forEach(p => { const b = document.createElement('span'); b.className = 'meta-badge meta-badge-product'; b.textContent = p; scopeMeta.appendChild(b); });
+    (ev.affected_teams || []).forEach(t => { const b = document.createElement('span'); b.className = 'meta-badge meta-badge-team'; b.textContent = t; scopeMeta.appendChild(b); });
+    scopeSec.appendChild(scopeTitle); scopeSec.appendChild(scopeMeta); body.appendChild(scopeSec);
+  }
+
+  // Recommendation
+  if (card.recommendation) {
+    const recSec = document.createElement('div'); recSec.className = 'detail-section';
+    const recTitle = document.createElement('div'); recTitle.className = 'detail-section-title'; recTitle.textContent = 'Recommendation';
+    const recBox = document.createElement('div'); recBox.className = 'detail-recommendation'; recBox.textContent = card.recommendation;
+    recSec.appendChild(recTitle); recSec.appendChild(recBox); body.appendChild(recSec);
+  }
+
+  // Caveats
+  if (card.caveats) {
+    const cavSec = document.createElement('div'); cavSec.className = 'detail-section';
+    const cavTitle = document.createElement('div'); cavTitle.className = 'detail-section-title'; cavTitle.textContent = 'Caveats';
+    const cavText = document.createElement('div'); cavText.className = 'detail-caveat'; cavText.textContent = card.caveats;
+    cavSec.appendChild(cavTitle); cavSec.appendChild(cavText); body.appendChild(cavSec);
+  }
+
+  // Phrases
+  if ((card.top_phrases || []).length > 0) {
+    const phSec = document.createElement('div'); phSec.className = 'detail-section';
+    const phTitle = document.createElement('div'); phTitle.className = 'detail-section-title'; phTitle.textContent = 'Key Phrases';
+    const phList = document.createElement('div'); phList.className = 'card-phrases';
+    card.top_phrases.forEach(p => { const t = document.createElement('span'); t.className = 'phrase-tag'; t.textContent = p; phList.appendChild(t); });
+    phSec.appendChild(phTitle); phSec.appendChild(phList); body.appendChild(phSec);
+  }
+
+  panel.appendChild(body);
+}
+
+// Event listeners
+document.getElementById('filter-type').addEventListener('change', e => { filters.type = e.target.value; renderCards(); });
+document.getElementById('filter-severity').addEventListener('change', e => { filters.severity = e.target.value; renderCards(); renderSeverityBar(); });
+document.getElementById('filter-search').addEventListener('input', e => { filters.search = e.target.value; renderCards(); });
+document.getElementById('filter-clear').addEventListener('click', () => { filters = {type:'',severity:'',search:''}; document.getElementById('filter-type').value=''; document.getElementById('filter-severity').value=''; document.getElementById('filter-search').value=''; renderCards(); renderSeverityBar(); });
+document.getElementById('btn-export').addEventListener('click', () => { const b = new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'forensic-findings.json'; a.click(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') selectCard(null); });
+
+// Pipeline toggle
+document.getElementById('pipeline-toggle').addEventListener('click', () => {
+  const body = document.getElementById('pipeline-body');
+  const btn = document.getElementById('pipeline-toggle');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    btn.querySelector('span').textContent = '▾ Pipeline Transparency — How These Patterns Were Computed';
+    renderPipeline();
+  } else {
+    body.style.display = 'none';
+    btn.querySelector('span').textContent = '▸ Pipeline Transparency — How These Patterns Were Computed';
+  }
+});
+
+function renderPipeline() {
+  if (!data || !data.pipeline) return;
+  const container = document.getElementById('pipeline-content');
+  while (container.firstChild) container.removeChild(container.firstChild);
+
+  const p = data.pipeline;
+
+  // Pipeline stages visualization
+  const stagesDiv = document.createElement('div');
+  stagesDiv.style.cssText = 'display:flex;gap:8px;align-items:center;margin:16px 0 24px;flex-wrap:wrap';
+
+  const stageColors = ['#0176D3', '#9050E9', '#E87722', '#2E844A', '#C23934'];
+  (p.stages || []).forEach((stage, i) => {
+    const pill = document.createElement('div');
+    pill.style.cssText = 'padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;color:white;background:' + stageColors[i % stageColors.length];
+    pill.textContent = stage.name;
+    stagesDiv.appendChild(pill);
+
+    if (i < (p.stages.length - 1)) {
+      const arrow = document.createElement('div');
+      arrow.style.cssText = 'color:var(--text-muted);font-size:16px';
+      arrow.textContent = '→';
+      stagesDiv.appendChild(arrow);
+    }
+  });
+  container.appendChild(stagesDiv);
+
+  // Total time
+  const timeDiv = document.createElement('div');
+  timeDiv.style.cssText = 'font-size:13px;color:var(--text-secondary);margin-bottom:20px';
+  timeDiv.textContent = 'Total pipeline execution: ' + (p.total_duration_seconds || '?') + ' seconds';
+  container.appendChild(timeDiv);
+
+  // Stage details
+  (p.stages || []).forEach((stage, i) => {
+    const section = document.createElement('div');
+    section.style.cssText = 'margin-bottom:16px;padding:16px;background:var(--bg);border-radius:8px;border-left:3px solid ' + stageColors[i % stageColors.length];
+
+    const title = document.createElement('div');
+    title.style.cssText = 'font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text)';
+    title.textContent = 'Stage ' + (i + 1) + ': ' + stage.name;
+    section.appendChild(title);
+
+    const details = document.createElement('div');
+    details.style.cssText = 'font-size:12px;font-family:var(--mono);color:var(--text-secondary);line-height:1.8';
+
+    const entries = Object.entries(stage).filter(function(e) { return e[0] !== 'name'; });
+    entries.forEach(function(entry) {
+      const line = document.createElement('div');
+      const key = entry[0].replace(/_/g, ' ');
+      var val = entry[1];
+      if (typeof val === 'object') val = JSON.stringify(val);
+      line.textContent = key + ': ' + val;
+      details.appendChild(line);
+    });
+
+    section.appendChild(details);
+    container.appendChild(section);
+  });
+
+  // Tech stack
+  const techDiv = document.createElement('div');
+  techDiv.style.cssText = 'margin-top:20px;padding:16px;background:#F0EDFF;border-radius:8px;border-left:3px solid #9050E9';
+  const techTitle = document.createElement('div');
+  techTitle.style.cssText = 'font-size:13px;font-weight:700;margin-bottom:8px;color:#9050E9';
+  techTitle.textContent = 'Technology Stack';
+  techDiv.appendChild(techTitle);
+  const techDetails = document.createElement('div');
+  techDetails.style.cssText = 'font-size:12px;font-family:var(--mono);color:var(--text-secondary);line-height:2';
+  var techLines = [
+    'Language: Python 3.11',
+    'ML: scikit-learn (TF-IDF vectorization, KMeans clustering)',
+    'NLP: n-gram extraction (1-3), English stop word removal, custom abbreviation expansion',
+    'Validation: Silhouette score for optimal cluster count',
+    'Data: Salesforce/HERB from HuggingFace (CC-BY-NC-4.0)',
+    'Frontend: Vanilla HTML/CSS/JS (zero dependencies)',
+    'Deployment: Vercel (static)',
+    'Source: github.com/chrbailey'
+  ];
+  techLines.forEach(function(line) {
+    var div = document.createElement('div');
+    div.textContent = line;
+    techDetails.appendChild(div);
+  });
+  techDiv.appendChild(techDetails);
+  container.appendChild(techDiv);
+}
+
+loadData();
+</script>
+</body>
+</html>

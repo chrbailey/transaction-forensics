@@ -1,0 +1,1019 @@
+{
+  "metadata": {
+    "generated_at": "2026-03-25T12:59:47.851042",
+    "author": "Christopher Bailey",
+    "engine": "Transaction Forensics Pattern Engine v1.0",
+    "source": "Salesforce/HERB",
+    "source_url": "https://huggingface.co/datasets/Salesforce/HERB",
+    "license": "CC-BY-NC-4.0",
+    "products_analyzed": [
+      "ActionGenie",
+      "AnomalyForce",
+      "AutoTuneForce",
+      "CoachForce",
+      "CollaborateForce",
+      "CollaborationForce",
+      "ConnectForce",
+      "ContentForce",
+      "ContextForce",
+      "EdgeForce",
+      "ExplainabilityForce",
+      "FeedbackForce",
+      "FlowForce",
+      "ForecastForce",
+      "InsightForce",
+      "KnowledgeForce",
+      "LeadForce",
+      "MonitorForce",
+      "PersonalizeForce",
+      "PitchForce",
+      "ProposalForce",
+      "SearchFlow",
+      "SearchForce",
+      "SecurityForce",
+      "SentimentForce",
+      "SummarizeForce",
+      "SupportForce",
+      "TrendForce",
+      "VizForce",
+      "WorkFlowGenie"
+    ],
+    "total_messages_scanned": 32781,
+    "total_documents_scanned": 400,
+    "total_transcripts_scanned": 321,
+    "total_prs_analyzed": 3562,
+    "total_customers": 120,
+    "total_team_members": 18
+  },
+  "pipeline": {
+    "stages": [
+      {
+        "name": "Ingest",
+        "duration_seconds": 0.201,
+        "documents_loaded": 37064,
+        "sources": {
+          "slack": 32781,
+          "transcript": 321,
+          "document": 400,
+          "pull_request": 3562
+        }
+      },
+      {
+        "name": "Normalize",
+        "description": "Text cleaning + 31 abbreviation expansions + URL/mention stripping"
+      },
+      {
+        "name": "Vectorize",
+        "method": "TF-IDF",
+        "features": 5000,
+        "ngram_range": [
+          1,
+          3
+        ],
+        "max_features": 5000
+      },
+      {
+        "name": "Cluster",
+        "method": "KMeans",
+        "optimal_k": 16,
+        "silhouette_score": 0.0286,
+        "duration_seconds": 17.743,
+        "cluster_sizes": {
+          "8": 891,
+          "14": 989,
+          "7": 12194,
+          "10": 4644,
+          "5": 2201,
+          "15": 905,
+          "6": 4044,
+          "0": 1223,
+          "1": 1745,
+          "12": 3510,
+          "2": 1182,
+          "3": 605,
+          "9": 797,
+          "4": 1024,
+          "13": 590,
+          "11": 520
+        }
+      },
+      {
+        "name": "Correlate",
+        "patterns_found": 16,
+        "duration_seconds": 0.024,
+        "severity_distribution": {
+          "critical": 1,
+          "medium": 15
+        }
+      }
+    ],
+    "total_duration_seconds": 17.968
+  },
+  "cards": [
+    {
+      "id": "PAT-2250B1",
+      "title": "Customer Data References in Open Channels",
+      "description": "Cluster of 4044 documents containing customer-specific data references (IDs, issues, data handling). Detected across 30 products. Risk: customer PII and issue details in unsecured communication channels.",
+      "type": "compliance",
+      "confidence": "HIGH",
+      "confidence_score": 0.92,
+      "severity": "critical",
+      "top_phrases": [
+        "data",
+        "issue",
+        "cust",
+        "model",
+        "customer",
+        "cause"
+      ],
+      "occurrence": "Found in 5,787 of 37,064 documents (15.6%)",
+      "effect": "Pattern spans 30 product teams with 2566 messages, 0 transcripts, 23 docs.",
+      "evidence": {
+        "source_count": 5787,
+        "source_breakdown": {
+          "slack": 2566,
+          "pull_request": 1455,
+          "document": 23
+        },
+        "sample_messages": [
+          "Sounds good, George. One more thing, in the Security and Authentication section, should we mention any specific compliance standards we're aiming to meet, like GDPR or CCPA? This could be important fo",
+          "I agree with @eid_8658e19c. Their NLP capabilities are impressive, but I wonder how they handle privacy concerns with all that data processing. \ud83e\udd14",
+          "TensorFlow's focus on model training efficiency is interesting. While our primary goal is ingestion, their methods for handling data efficiently could be beneficial. We might find some useful patterns",
+          "First up, we have Mattermost's integration of webhooks for third-party app interactions. This feature allows Mattermost to exchange data in real-time with other applications. You can check out the PR ",
+          "Thanks, Julia! The Mattermost approach seems pretty straightforward and could be a good reference for setting up our endpoints. Real-time data exchange is crucial for us too. I think we should definit"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "planning-onForceX",
+          "develop-ianmiller-ActionGenie",
+          "develop-emmajones-ActionGenie",
+          "bug-ianmiller-ActionGenie",
+          "bug-charliegarcia-ActionGenie"
+        ],
+        "time_range": "2026-01-26 to 2027-07-14"
+      },
+      "sample_snippets": [
+        "Sounds good, George. One more thing, in the Security and Authentication section, should we mention a",
+        "I agree with @eid_8658e19c. Their NLP capabilities are impressive, but I wonder how they handle priv"
+      ],
+      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
+      "recommendation": "Implement DLP scanning on Slack channels. Route customer-specific discussions to private channels with access controls.",
+      "computation": {
+        "cluster_id": 6,
+        "cluster_size": 5787,
+        "method": "TF-IDF + KMeans",
+        "top_tfidf_terms": [
+          "data",
+          "issue",
+          "cust",
+          "model",
+          "customer",
+          "cause"
+        ]
+      }
+    },
+    {
+      "id": "PAT-543C52",
+      "title": "API/Integration Work Siloed Across Teams",
+      "description": "1745 documents about API development and integration architecture. Each product team building API layers independently without shared standards or components.",
+      "type": "communication",
+      "confidence": "LOW",
+      "confidence_score": 0.59,
+      "severity": "high",
+      "top_phrases": [
+        "api",
+        "programming",
+        "api application programming",
+        "application programming",
+        "application programming interface",
+        "programming interface"
+      ],
+      "occurrence": "Found in 1,745 of 37,064 documents (4.7%)",
+      "effect": "Pattern spans 30 product teams with 1328 messages, 0 transcripts, 0 docs.",
+      "evidence": {
+        "source_count": 1745,
+        "source_breakdown": {
+          "slack": 1328,
+          "pull_request": 417
+        },
+        "sample_messages": [
+          "Great points, both of you! Next, let's look at Rocket.Chat's real-time event API integration. This feature facilitates seamless interactions with external applications. Here's the PR link: https://git",
+          "Thanks for the input, everyone! I'll take a closer look at these features and see how we can adapt some of their strategies for our Slack Events API integration. I'll keep you all updated on my findin",
+          "Alright, I've gone through the changes. The Slack Events API integration looks solid, and I can see that the endpoints are correctly set up to handle incoming events. Nice work! \ud83d\udc4d"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "develop-ianmiller-ActionGenie",
+          "develop-emmajones-ActionGenie",
+          "bug-ianmiller-ActionGenie",
+          "bug-charliegarcia-ActionGenie",
+          "bug-emmajones-ActionGenie"
+        ],
+        "time_range": "2026-01-21 to 2027-07-10"
+      },
+      "sample_snippets": [
+        "Great points, both of you! Next, let's look at Rocket.Chat's real-time event API integration. This f",
+        "Thanks for the input, everyone! I'll take a closer look at these features and see how we can adapt s"
+      ],
+      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
+      "recommendation": "Establish API governance council. Create shared API design guidelines and reusable SDK components across product teams.",
+      "computation": {
+        "cluster_id": 1,
+        "cluster_size": 1745,
+        "method": "TF-IDF + KMeans",
+        "top_tfidf_terms": [
+          "api",
+          "programming",
+          "api application programming",
+          "application programming",
+          "application programming interface",
+          "programming interface"
+        ]
+      }
+    },
+    {
+      "id": "PAT-926147",
+      "title": "Pull Request Discussion Outside Review Tools",
+      "description": "3510 PR-related discussions happening in Slack instead of in the PR review tool. Decisions and context lost outside the code review system.",
+      "type": "anomaly",
+      "confidence": "HIGH",
+      "confidence_score": 0.83,
+      "severity": "medium",
+      "top_phrases": [
+        "pr",
+        "pr pull",
+        "pr pull request",
+        "pull request",
+        "pull",
+        "request"
+      ],
+      "occurrence": "Found in 4,692 of 37,064 documents (12.7%)",
+      "effect": "Pattern spans 30 product teams with 3231 messages, 0 transcripts, 0 docs.",
+      "evidence": {
+        "source_count": 4692,
+        "source_breakdown": {
+          "slack": 3231,
+          "pull_request": 279
+        },
+        "sample_messages": [
+          "Absolutely, Bob! Lastly, we have Zulip's enhancement of their bot framework to handle events from external services. This improves automation and integration capabilities. Check out the PR here: https",
+          "Great points, @eid_49aa3b00 and Charlie! Next up is TensorFlow's feature. They have a PR titled 'Efficient Data Pipeline for Model Training' which enhances data handling efficiency during model traini",
+          "Agreed, both of you. Lastly, let's look at Apache Airflow's feature. They have a PR titled 'Dynamic Task Scheduling for Data Pipelines' which adds dynamic scheduling capabilities. Here's the link: htt",
+          "Hi team, please check my PR for integrating the Slack Events API: https://github.com/salesforce/onForceX/pull/1. This will allow onForceX to interact with third-party Slack apps by setting up the nece",
+          "Hi team, please check my PR for the new data ingestion pipeline: https://github.com/salesforce/onForceX/pull/3. \ud83d\ude80 This PR introduces a pipeline to efficiently process incoming data for AI model update"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "develop-ianmiller-ActionGenie",
+          "develop-emmajones-ActionGenie",
+          "bug-ianmiller-ActionGenie",
+          "bug-charliegarcia-ActionGenie",
+          "bug-emmajones-ActionGenie"
+        ],
+        "time_range": "2026-03-20 to 2027-07-10"
+      },
+      "sample_snippets": [
+        "Absolutely, Bob! Lastly, we have Zulip's enhancement of their bot framework to handle events from ex",
+        "Great points, @eid_49aa3b00 and Charlie! Next up is TensorFlow's feature. They have a PR titled 'Eff"
+      ],
+      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
+      "recommendation": "Link Slack PR discussions back to GitHub/GitLab PR comments. Ensure all technical decisions are captured in the review tool, not just Slack.",
+      "computation": {
+        "cluster_id": 12,
+        "cluster_size": 4692,
+        "method": "TF-IDF + KMeans",
+        "top_tfidf_terms": [
+          "pr",
+          "pr pull",
+          "pr pull request",
+          "pull request",
+          "pull",
+          "request"
+        ]
+      }
+    },
+    {
+      "id": "PAT-1555C1",
+      "title": "Hi Team / Team",
+      "description": "Cluster of 989 documents sharing phrases: hi team, hi, team, open source, source. Found across 30 products and 1 source types.",
+      "type": "anomaly",
+      "confidence": "LOW",
+      "confidence_score": 0.53,
+      "severity": "medium",
+      "top_phrases": [
+        "hi team",
+        "hi",
+        "team",
+        "open source",
+        "source",
+        "discuss"
+      ],
+      "occurrence": "Found in 989 of 37,064 documents (2.7%)",
+      "effect": "Pattern spans 30 product teams with 989 messages, 0 transcripts, 0 docs.",
+      "evidence": {
+        "source_count": 989,
+        "source_breakdown": {
+          "slack": 989
+        },
+        "sample_messages": [
+          "Hi team, I've shared the <https://sf-internal.slack.com/archives/docs/onforcex_market_research_report|Market Research Report> for onForceX. Let's discuss and refine it together. Looking forward to you",
+          "Hi team, I wanted to discuss the Market Research Report on X-Genie. It's pretty interesting and I think we can learn a lot from it. \ud83d\udcca",
+          "Hi team, I've shared the <https://sf-internal.slack.com/archives/docs/onforcex_product_vision_document|Product Vision Document> for onForceX. Let's discuss and refine it to ensure it aligns with our s"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "planning-onForceX",
+          "develop-ianmiller-ActionGenie",
+          "develop-emmajones-ActionGenie",
+          "bug-ianmiller-ActionGenie",
+          "bug-davidwilliams-ActionGenie"
+        ],
+        "time_range": "2026-01-16 to 2027-07-10"
+      },
+      "sample_snippets": [
+        "Hi team, I've shared the <https://sf-internal.slack.com/archives/docs/onforcex_market_research_repor",
+        "Hi team, I wanted to discuss the Market Research Report on X-Genie. It's pretty interesting and I th"
+      ],
+      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
+      "recommendation": "Review the 989 documents in this cluster for actionable patterns. Top signal phrases: hi team, hi, team.",
+      "computation": {
+        "cluster_id": 14,
+        "cluster_size": 989,
+        "method": "TF-IDF + KMeans",
+        "top_tfidf_terms": [
+          "hi team",
+          "hi",
+          "team",
+          "open source",
+          "source",
+          "discuss"
+        ]
+      }
+    },
+    {
+      "id": "PAT-4A57A4",
+      "title": "Informal Approval Patterns (LGTM Culture)",
+      "description": "797 instances of informal approval language ('LGTM', 'approved') without formal review workflows. Approvals happen in Slack rather than through structured review systems.",
+      "type": "approval",
+      "confidence": "LOW",
+      "confidence_score": 0.51,
+      "severity": "medium",
+      "top_phrases": [
+        "approved",
+        "lgtm",
+        "lgtm approved",
+        "looks",
+        "criteria",
+        "looks good"
+      ],
+      "occurrence": "Found in 797 of 37,064 documents (2.2%)",
+      "effect": "Pattern spans 30 product teams with 797 messages, 0 transcripts, 0 docs.",
+      "evidence": {
+        "source_count": 797,
+        "source_breakdown": {
+          "slack": 797
+        },
+        "sample_messages": [
+          "Everything looks good to me. LGTM, approved! \u2705",
+          "Yep, I can confirm that too. The integration looks seamless. LGTM, approved! \u2705",
+          "Great to hear! I just went through the code and the documentation. Everything looks solid to me. The alerting system is well-configured, and the error handling is comprehensive. LGTM, approved! \ud83d\udc4d"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "develop-ianmiller-ActionGenie",
+          "develop-emmajones-ActionGenie",
+          "bug-davidwilliams-ActionGenie",
+          "develop-georgegarcia-AnomalyForce",
+          "develop-fionabrown-AnomalyForce"
+        ],
+        "time_range": "2026-03-14 to 2027-04-19"
+      },
+      "sample_snippets": [
+        "Everything looks good to me. LGTM, approved! \u2705",
+        "Yep, I can confirm that too. The integration looks seamless. LGTM, approved! \u2705"
+      ],
+      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
+      "recommendation": "Implement required approval workflows in CI/CD. LGTM in Slack should trigger formal review tool approval, not replace it.",
+      "computation": {
+        "cluster_id": 9,
+        "cluster_size": 797,
+        "method": "TF-IDF + KMeans",
+        "top_tfidf_terms": [
+          "approved",
+          "lgtm",
+          "lgtm approved",
+          "looks",
+          "criteria",
+          "looks good"
+        ]
+      }
+    },
+    {
+      "id": "PAT-46B914",
+      "title": "Positive Sentiment Clustering (Baseline)",
+      "description": "12194 documents with positive/forward-looking language. Serves as sentiment baseline \u2014 deviation from this pattern could indicate team morale issues.",
+      "type": "anomaly",
+      "confidence": "HIGH",
+      "confidence_score": 0.95,
+      "severity": "low",
+      "top_phrases": [
+        "user",
+        "great",
+        "think",
+        "good",
+        "help",
+        "agree"
+      ],
+      "occurrence": "Found in 13,099 of 37,064 documents (35.3%)",
+      "effect": "Pattern spans 30 product teams with 10948 messages, 36 transcripts, 49 docs.",
+      "evidence": {
+        "source_count": 13099,
+        "source_breakdown": {
+          "slack": 10948,
+          "transcript": 36,
+          "document": 49,
+          "pull_request": 1161
+        },
+        "sample_messages": [
+          "Thanks for sharing, Charlie! @eid_13fdff84 I think the Executive Summary is clear, but it might benefit from a bit more detail on the specific AI technologies used. This could help differentiate us fr",
+          "Good point, Emma. Also, in the Market Overview section, it might be helpful to include some recent statistics or trends about the growth of AI in collaboration tools. This could strengthen our argumen",
+          "I agree with George. Adding some data could really bolster the Market Overview. Additionally, in the Target Audience section, maybe we could specify more about the size of businesses we're targeting. ",
+          "Sounds good, @eid_fd8cecea. Looking forward to it! \ud83d\udc4d",
+          "Looking forward to it! Thanks for the great discussion, everyone. \ud83d\ude0a"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "planning-onForceX",
+          "develop-emmamiller-ActionGenie",
+          "develop-charliegarcia-ActionGenie",
+          "develop-davidwilliams-ActionGenie",
+          "develop-georgebrown-ActionGenie"
+        ],
+        "time_range": "2026-01-16 to 2027-07-16"
+      },
+      "sample_snippets": [
+        "Thanks for sharing, Charlie! @eid_13fdff84 I think the Executive Summary is clear, but it might bene",
+        "Good point, Emma. Also, in the Market Overview section, it might be helpful to include some recent s"
+      ],
+      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
+      "recommendation": "Use as baseline for sentiment monitoring. Track ratio of positive vs. concern-bearing messages over time.",
+      "computation": {
+        "cluster_id": 7,
+        "cluster_size": 13099,
+        "method": "TF-IDF + KMeans",
+        "top_tfidf_terms": [
+          "user",
+          "great",
+          "think",
+          "good",
+          "help",
+          "agree"
+        ]
+      }
+    },
+    {
+      "id": "PAT-9D8772",
+      "title": "Information Sharing Patterns",
+      "description": "4644 documents with information-sharing language. Healthy communication baseline indicating active knowledge transfer.",
+      "type": "communication",
+      "confidence": "HIGH",
+      "confidence_score": 0.95,
+      "severity": "low",
+      "top_phrases": [
+        "ll",
+        "thanks",
+        "let",
+        "posted",
+        "review",
+        "ll posted"
+      ],
+      "occurrence": "Found in 7,450 of 37,064 documents (20.1%)",
+      "effect": "Pattern spans 30 product teams with 4644 messages, 0 transcripts, 0 docs.",
+      "evidence": {
+        "source_count": 7450,
+        "source_breakdown": {
+          "slack": 4644
+        },
+        "sample_messages": [
+          "Great suggestions, everyone! @eid_d96fb219, I'll add more details about the AI technologies. @eid_ec3b5d65 and @eid_2589c967, I'll look for some recent stats and clarify the target business size. Any ",
+          "Thanks for the insights, team! I'll incorporate these changes: add AI tech details, include market stats, specify target business size, highlight our unique selling points, and expand on partnerships ",
+          "Sounds good, @Emma Miller. I'll start drafting some notes on potential improvements we can make. \ud83d\udcdd",
+          "Same here! Let's make our product even better. \ud83d\udcaa",
+          "Great work on collaborating with the design team, @eid_af89b40b! I'll focus on how the feedback from accessibility testing has been incorporated. Let's make sure everything's spot on! \ud83d\ude80"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "planning-onForceX",
+          "develop-ianmiller-ActionGenie",
+          "develop-emmajones-ActionGenie",
+          "bug-ianmiller-ActionGenie",
+          "bug-charliegarcia-ActionGenie"
+        ],
+        "time_range": "2026-01-16 to 2027-07-16"
+      },
+      "sample_snippets": [
+        "Great suggestions, everyone! @eid_d96fb219, I'll add more details about the AI technologies. @eid_ec",
+        "Thanks for the insights, team! I'll incorporate these changes: add AI tech details, include market s"
+      ],
+      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
+      "recommendation": "No action needed \u2014 healthy communication pattern. Monitor for decline as early warning of knowledge silo formation.",
+      "computation": {
+        "cluster_id": 10,
+        "cluster_size": 7450,
+        "method": "TF-IDF + KMeans",
+        "top_tfidf_terms": [
+          "ll",
+          "thanks",
+          "let",
+          "posted",
+          "review",
+          "ll posted"
+        ]
+      }
+    },
+    {
+      "id": "PAT-C418CA",
+      "title": "Request/Response Communication Patterns",
+      "description": "1024 question-and-response exchanges. Normal operational communication \u2014 useful as baseline for measuring response time patterns.",
+      "type": "communication",
+      "confidence": "LOW",
+      "confidence_score": 0.53,
+      "severity": "low",
+      "top_phrases": [
+        "let know",
+        "know",
+        "let",
+        "let know need",
+        "know need",
+        "need"
+      ],
+      "occurrence": "Found in 1,024 of 37,064 documents (2.8%)",
+      "effect": "Pattern spans 30 product teams with 1024 messages, 0 transcripts, 0 docs.",
+      "evidence": {
+        "source_count": 1024,
+        "source_breakdown": {
+          "slack": 1024
+        },
+        "sample_messages": [
+          "Sounds good, @eid_13cb0e90. Once that's done, we can re-evaluate. Let us know if you need any help setting up the tests. \ud83d\udcaa",
+          "Sounds like a plan, Charlie! Let us know if you need any help with the investigation. Looking forward to seeing how we can enhance our microservices with these insights. \ud83d\ude0a",
+          "Sounds good, @eid_4cede092! Looking forward to the updates. Let us know if you need any help. \ud83d\ude0a"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "develop-ianmiller-ActionGenie",
+          "develop-emmajones-ActionGenie",
+          "bug-ianmiller-ActionGenie",
+          "bug-charliegarcia-ActionGenie",
+          "bug-emmajones-ActionGenie"
+        ],
+        "time_range": "2026-01-27 to 2027-07-16"
+      },
+      "sample_snippets": [
+        "Sounds good, @eid_13cb0e90. Once that's done, we can re-evaluate. Let us know if you need any help s",
+        "Sounds like a plan, Charlie! Let us know if you need any help with the investigation. Looking forwar"
+      ],
+      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
+      "recommendation": "Track response latency trends. If 'let me know' messages increase without responses, flag as communication breakdown risk.",
+      "computation": {
+        "cluster_id": 4,
+        "cluster_size": 1024,
+        "method": "TF-IDF + KMeans",
+        "top_tfidf_terms": [
+          "let know",
+          "know",
+          "let",
+          "let know need",
+          "know need",
+          "need"
+        ]
+      }
+    },
+    {
+      "id": "PAT-C13A16",
+      "title": "Channel Join/Leave Churn",
+      "description": "891 channel join/leave events detected. High channel membership turnover may indicate unclear channel purpose or team restructuring.",
+      "type": "communication",
+      "confidence": "LOW",
+      "confidence_score": 0.52,
+      "severity": "low",
+      "top_phrases": [
+        "joined",
+        "joined develop",
+        "joined planning",
+        "develop",
+        "planning",
+        "joined invite"
+      ],
+      "occurrence": "Found in 891 of 37,064 documents (2.4%)",
+      "effect": "Pattern spans 30 product teams with 891 messages, 0 transcripts, 0 docs.",
+      "evidence": {
+        "source_count": 891,
+        "source_breakdown": {
+          "slack": 891
+        },
+        "sample_messages": [
+          "@eid_13fdff84 joined planning-onForceX. Also, @eid_d96fb219, @eid_2589c967, @eid_ec3b5d65 joined via invite.",
+          "@eid_4df5d4b7, @eid_8658e19c, @eid_fa6ec727, @eid_13cb0e90 joined planning-onForceX.",
+          "@eid_fd8cecea, @eid_eb1756e0 joined planning-onForceX."
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "planning-onForceX",
+          "develop-emmamiller-ActionGenie",
+          "develop-charliegarcia-ActionGenie",
+          "develop-davidwilliams-ActionGenie",
+          "develop-georgebrown-ActionGenie"
+        ],
+        "time_range": "2026-01-14 to 2027-07-08"
+      },
+      "sample_snippets": [
+        "@eid_13fdff84 joined planning-onForceX. Also, @eid_d96fb219, @eid_2589c967, @eid_ec3b5d65 joined via",
+        "@eid_4df5d4b7, @eid_8658e19c, @eid_fa6ec727, @eid_13cb0e90 joined planning-onForceX."
+      ],
+      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
+      "recommendation": "Audit channel descriptions and purpose statements. Archive inactive channels. Reduce channel sprawl.",
+      "computation": {
+        "cluster_id": 8,
+        "cluster_size": 891,
+        "method": "TF-IDF + KMeans",
+        "top_tfidf_terms": [
+          "joined",
+          "joined develop",
+          "joined planning",
+          "develop",
+          "planning",
+          "joined invite"
+        ]
+      }
+    },
+    {
+      "id": "PAT-5515FE",
+      "title": "Open Collaboration Signals",
+      "description": "590 instances of open-invitation language ('feel free to...'). Indicates collaborative culture but may mask unclear ownership \u2014 who is actually responsible?",
+      "type": "communication",
+      "confidence": "LOW",
+      "confidence_score": 0.5,
+      "severity": "low",
+      "top_phrases": [
+        "feel free",
+        "free",
+        "feel",
+        "feel free reach",
+        "free reach",
+        "reach"
+      ],
+      "occurrence": "Found in 590 of 37,064 documents (1.6%)",
+      "effect": "Pattern spans 30 product teams with 590 messages, 0 transcripts, 0 docs.",
+      "evidence": {
+        "source_count": 590,
+        "source_breakdown": {
+          "slack": 590
+        },
+        "sample_messages": [
+          "Absolutely, feel free to reach out if you need a hand with anything. Looking forward to the updates! \ud83d\ude0a",
+          "Absolutely, feel free to reach out if you need anything. Thanks for tackling this important update, @eid_4cede092! \ud83d\ude4c",
+          "Yeah, feel free to reach out if you need a hand. Once the preferences are sorted, I think we'll be good to go! \ud83d\ude80"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "develop-ianmiller-ActionGenie",
+          "develop-emmajones-ActionGenie",
+          "bug-ianmiller-ActionGenie",
+          "bug-charliegarcia-ActionGenie",
+          "bug-emmajones-ActionGenie"
+        ],
+        "time_range": "2026-02-07 to 2027-06-30"
+      },
+      "sample_snippets": [
+        "Absolutely, feel free to reach out if you need a hand with anything. Looking forward to the updates!",
+        "Absolutely, feel free to reach out if you need anything. Thanks for tackling this important update, "
+      ],
+      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
+      "recommendation": "Pair 'feel free' invitations with explicit ownership: 'Feel free to review, but Alice owns the final decision.'",
+      "computation": {
+        "cluster_id": 13,
+        "cluster_size": 590,
+        "method": "TF-IDF + KMeans",
+        "top_tfidf_terms": [
+          "feel free",
+          "free",
+          "feel",
+          "feel free reach",
+          "free reach",
+          "reach"
+        ]
+      }
+    }
+  ]
+}
