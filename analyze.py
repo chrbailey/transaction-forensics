@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """
-Transaction Forensics — Pattern Engine v2.0
-Analyzes Salesforce HERB enterprise communication data using NLP clustering
-with evidence-backed scoring, cluster stability analysis, and relational joins.
+Transaction Forensics — Pattern Engine v3.0
+Enterprise communication forensics using semantic NLP, network analysis,
+and temporal change-point detection.
 
-Pipeline: Ingest → Normalize → Vectorize → Cluster → Stabilize → Measure → Report
+Pipeline: Ingest → Normalize → Embed (SBERT) → Cluster (BERTopic/HDBSCAN)
+                              → Network Graph → Temporal Analysis
+                              → Stabilize → Measure → Report
 
-v2.0 changes (from reviewer feedback):
-  - Replaced keyword-based severity with COMPUTED METRICS
-  - Added cluster stability scoring (bootstrap, 10 random seeds)
-  - Added relational joins: user-to-team, message-to-customer, cross-product overlap
-  - Pruned low-signal clusters (minimum stability threshold)
-  - Full provenance: every metric shows HOW it was computed
+v3.0 changes:
+  - BERTopic (sentence-transformers + HDBSCAN) replaces TF-IDF + KMeans
+  - Network analysis: communication graph, centrality, community detection
+  - Temporal change-point detection via ruptures
+  - TF-IDF + KMeans kept as fallback if BERTopic fails (no GPU, memory)
+  - Computed metrics (v2.0) retained and enhanced with graph/temporal signals
 
 Author: Christopher Bailey
 Data Source: Salesforce/HERB (HuggingFace)
@@ -707,12 +709,13 @@ def generate_report(ingest_result: dict, clustering: dict, stability: dict,
 
 def main():
     print("=" * 60)
-    print("Transaction Forensics — Pattern Engine v2.0")
+    print("Transaction Forensics — Pattern Engine v3.0")
     print("Author: Christopher Bailey")
     print("Data: Salesforce/HERB (HuggingFace)")
     print("=" * 60)
 
-    print("\n[1/6] Ingesting HERB dataset...")
+    # ── Stage 1: Ingest ──
+    print("\n[1/8] Ingesting HERB dataset...")
     ingest_result = ingest_herb(HERB_BASE)
     stats = ingest_result["stats"]
     print(f"      {stats['total_documents']:,} documents in {stats['ingest_time_seconds']}s")
@@ -720,21 +723,65 @@ def main():
     print(f"      Products: {len(ingest_result['products'])}")
     print(f"      Employees: {len(ingest_result['employees'])}, Customers: {len(ingest_result['customers'])}")
 
-    print(f"\n[2/6] Normalizing ({len(SF_ABBREVIATIONS)} abbreviation expansions)...")
+    # ── Stage 2: Normalize ──
+    print(f"\n[2/8] Normalizing ({len(SF_ABBREVIATIONS)} abbreviation expansions)...")
+    texts = [normalize_text(d["text"]) for d in ingest_result["documents"]]
 
-    print(f"\n[3/6] TF-IDF + KMeans clustering...")
+    # ── Stage 3: BERTopic Clustering (with TF-IDF fallback) ──
+    bertopic_result = None
+    try:
+        from bertopic_cluster import cluster_with_bertopic
+        print(f"\n[3/8] BERTopic clustering (SBERT + HDBSCAN)...")
+        bertopic_result = cluster_with_bertopic(texts, min_topic_size=20)
+        print(f"      Topics: {bertopic_result['n_topics']} (outliers: {bertopic_result['outlier_count']})")
+        print(f"      Silhouette: {bertopic_result['silhouette_score']}")
+        print(f"      Time: {bertopic_result['duration_seconds']}s")
+        for tid, info in list(bertopic_result['topic_representations'].items())[:5]:
+            print(f"      Topic {tid}: {', '.join(info[:5])}")
+    except Exception as e:
+        print(f"\n[3/8] BERTopic failed ({e}), falling back to TF-IDF + KMeans...")
+
+    # TF-IDF + KMeans (always run for stability analysis)
+    print(f"\n[4/8] TF-IDF + KMeans clustering (for stability baseline)...")
     clustering = cluster_documents(ingest_result["documents"])
     print(f"      Features: {clustering['tfidf_features']}, k={clustering['n_clusters']} (silhouette: {clustering['silhouette_score']})")
-    print(f"      Per-cluster silhouette: {clustering['cluster_silhouette_means']}")
 
-    print(f"\n[4/6] Bootstrap stability ({STABILITY_RUNS} runs)...")
+    # ── Stage 4: Network Analysis ──
+    network_result = None
+    try:
+        from network_analysis import build_communication_graph
+        print(f"\n[5/8] Network analysis (communication graph)...")
+        network_result = build_communication_graph(ingest_result["documents"])
+        print(f"      Nodes: {network_result.get('n_nodes', '?')}, Edges: {network_result.get('n_edges', '?')}")
+        print(f"      Communities: {network_result.get('n_communities', '?')}")
+        print(f"      Density: {network_result.get('graph_density', '?')}")
+        if network_result.get('bridge_users'):
+            print(f"      Bridge users: {[u[:15] for u in network_result['bridge_users'][:3]]}")
+        if network_result.get('isolated_products'):
+            print(f"      Isolated products: {network_result['isolated_products'][:3]}")
+    except Exception as e:
+        print(f"\n[5/8] Network analysis failed: {e}")
+
+    # ── Stage 5: Temporal Analysis ──
+    temporal_result = None
+    try:
+        from temporal_analysis import analyze_temporal_patterns
+        print(f"\n[6/8] Temporal change-point detection...")
+        temporal_result = analyze_temporal_patterns(ingest_result["documents"])
+        print(f"      Window: {temporal_result.get('activity_windows', {}).get('total_days', '?')} days")
+        print(f"      Change points: {len(temporal_result.get('change_points', []))}")
+        if temporal_result.get('busiest_day'):
+            print(f"      Busiest day: {temporal_result['busiest_day']}")
+    except Exception as e:
+        print(f"\n[6/8] Temporal analysis failed: {e}")
+
+    # ── Stage 6: Bootstrap Stability ──
+    print(f"\n[7/8] Bootstrap stability ({STABILITY_RUNS} runs)...")
     stability = compute_stability(clustering["tfidf_matrix"], clustering["n_clusters"], clustering["labels"])
     print(f"      Stable: {stability['stable_count']}, Pruned: {stability['pruned_count']}")
-    for label, s in stability["scores"].items():
-        status = "STABLE" if s["stable"] else "PRUNED"
-        print(f"      Cluster {label:>2}: {s['mean']:.0%} stability ({status})")
 
-    print(f"\n[5/6] Computing evidence-based metrics...")
+    # ── Stage 7: Measure + Build Cards ──
+    print(f"\n[8/8] Computing evidence-based metrics + building cards...")
     cards, pruned, build_time = build_cards(
         ingest_result["documents"], clustering, stability,
         ingest_result["employee_map"], ingest_result["customer_map"]
@@ -742,13 +789,71 @@ def main():
     print(f"      {len(cards)} patterns surfaced, {len(pruned)} pruned")
     for c in cards:
         print(f"      {c['severity']:8} | {c['type']:12} | {c['confidence']} ({c['confidence_score']:.0%}) | {c['title'][:45]}")
-    if pruned:
-        print(f"      Pruned:")
-        for p in pruned:
-            print(f"        Cluster {p['cluster_id']}: {p['reason']}")
 
-    print(f"\n[6/6] Generating report...")
+    # ── Generate Report ──
     report = generate_report(ingest_result, clustering, stability, cards, pruned, build_time)
+
+    # Add BERTopic results to report
+    if bertopic_result:
+        # Don't serialize embeddings (numpy array)
+        bt_clean = {k: v for k, v in bertopic_result.items() if k != 'embeddings'}
+        report["pipeline"]["bertopic"] = bt_clean
+        report["pipeline"]["stages"].insert(2, {
+            "name": "BERTopic",
+            "method": "Sentence-Transformers (all-MiniLM-L6-v2) + HDBSCAN",
+            "n_topics": bertopic_result["n_topics"],
+            "outliers": bertopic_result["outlier_count"],
+            "silhouette_score": bertopic_result["silhouette_score"],
+            "duration_seconds": bertopic_result["duration_seconds"],
+            "top_topics": {str(k): v[:5] for k, v in list(bertopic_result["topic_representations"].items())[:8]},
+        })
+
+    # Add network results
+    if network_result:
+        # Don't serialize full centrality dicts (too large)
+        net_summary = {
+            "n_nodes": network_result.get("n_nodes"),
+            "n_edges": network_result.get("n_edges"),
+            "n_communities": network_result.get("n_communities"),
+            "graph_density": network_result.get("graph_density"),
+            "bridge_users": network_result.get("bridge_users", [])[:5],
+            "isolated_products": network_result.get("isolated_products", []),
+            "duration_seconds": network_result.get("duration_seconds"),
+        }
+        # Product overlap for top pairs
+        overlap = network_result.get("product_overlap_matrix", {})
+        top_overlaps = sorted(overlap.items(), key=lambda x: x[1], reverse=True)[:10]
+        net_summary["top_product_overlaps"] = {k: v for k, v in top_overlaps}
+
+        report["pipeline"]["network"] = net_summary
+        report["pipeline"]["stages"].append({
+            "name": "Network",
+            "method": "Communication graph (NetworkX), Louvain communities, centrality analysis",
+            "n_nodes": net_summary["n_nodes"],
+            "n_edges": net_summary["n_edges"],
+            "communities": net_summary["n_communities"],
+            "bridge_users": net_summary["bridge_users"],
+            "density": net_summary["graph_density"],
+        })
+
+    # Add temporal results
+    if temporal_result:
+        report["pipeline"]["temporal"] = temporal_result
+        report["pipeline"]["stages"].append({
+            "name": "Temporal",
+            "method": "Change-point detection (ruptures PELT, RBF kernel)",
+            "total_days": temporal_result.get("activity_windows", {}).get("total_days"),
+            "change_points": len(temporal_result.get("change_points", [])),
+            "busiest_day": temporal_result.get("busiest_day"),
+        })
+
+    # Recalculate total duration
+    total_time = sum(
+        s.get("duration_seconds", 0) for s in report["pipeline"]["stages"]
+        if isinstance(s.get("duration_seconds"), (int, float))
+    )
+    report["pipeline"]["total_duration_seconds"] = round(total_time, 3)
+    report["metadata"]["engine"] = "Transaction Forensics Pattern Engine v3.0"
 
     output_path = OUTPUT_DIR / "pattern_cards.json"
     with open(output_path, "w") as f:
