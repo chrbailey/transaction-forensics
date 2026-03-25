@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "generated_at": "2026-03-25T12:59:47.851042",
+    "generated_at": "2026-03-25T14:04:21.849435",
     "author": "Christopher Bailey",
-    "engine": "Transaction Forensics Pattern Engine v1.0",
+    "engine": "Transaction Forensics Pattern Engine v2.0",
     "source": "Salesforce/HERB",
     "source_url": "https://huggingface.co/datasets/Salesforce/HERB",
     "license": "CC-BY-NC-4.0",
@@ -46,21 +46,23 @@
     "total_team_members": 18
   },
   "pipeline": {
+    "version": "2.0",
     "stages": [
       {
         "name": "Ingest",
-        "duration_seconds": 0.201,
+        "duration_seconds": 0.159,
         "documents_loaded": 37064,
         "sources": {
           "slack": 32781,
           "transcript": 321,
           "document": 400,
           "pull_request": 3562
-        }
+        },
+        "relational_joins": "employee_map, customer_map loaded for cross-referencing"
       },
       {
         "name": "Normalize",
-        "description": "Text cleaning + 31 abbreviation expansions + URL/mention stripping"
+        "description": "Text cleaning + 22 abbreviation expansions + URL/mention stripping"
       },
       {
         "name": "Vectorize",
@@ -75,162 +77,142 @@
       {
         "name": "Cluster",
         "method": "KMeans",
-        "optimal_k": 16,
-        "silhouette_score": 0.0286,
-        "duration_seconds": 17.743,
+        "optimal_k": 15,
+        "silhouette_score": 0.0269,
+        "k_scores": {
+          "8": 0.0213,
+          "9": 0.0213,
+          "10": 0.0224,
+          "11": 0.0246,
+          "12": 0.0257,
+          "13": 0.026,
+          "14": 0.0245,
+          "15": 0.0269,
+          "16": 0.0266
+        },
+        "per_cluster_silhouette": {
+          "3": 0.1882,
+          "10": 0.0993,
+          "6": -0.004,
+          "2": -0.0034,
+          "8": 0.0021,
+          "14": 0.0536,
+          "7": 0.0565,
+          "12": 0.0524,
+          "13": 0.0076,
+          "11": 0.0678,
+          "1": 0.1317,
+          "5": 0.1554,
+          "4": 0.0546,
+          "9": 0.4798,
+          "0": 0.1365
+        },
+        "duration_seconds": 22.791,
         "cluster_sizes": {
-          "8": 891,
-          "14": 989,
-          "7": 12194,
-          "10": 4644,
-          "5": 2201,
-          "15": 905,
-          "6": 4044,
-          "0": 1223,
-          "1": 1745,
-          "12": 3510,
-          "2": 1182,
-          "3": 605,
-          "9": 797,
-          "4": 1024,
-          "13": 590,
-          "11": 520
+          "3": 891,
+          "10": 930,
+          "6": 12002,
+          "2": 5369,
+          "8": 5384,
+          "14": 1138,
+          "7": 1452,
+          "12": 888,
+          "13": 3951,
+          "11": 1800,
+          "1": 686,
+          "5": 802,
+          "4": 1226,
+          "9": 297,
+          "0": 248
         }
       },
       {
-        "name": "Correlate",
-        "patterns_found": 16,
-        "duration_seconds": 0.024,
-        "severity_distribution": {
-          "critical": 1,
-          "medium": 15
-        }
+        "name": "Stabilize",
+        "method": "Bootstrap (10 runs, Jaccard similarity)",
+        "threshold": 0.5,
+        "stable_clusters": 11,
+        "pruned_clusters": 4,
+        "duration_seconds": 7.608
+      },
+      {
+        "name": "Measure",
+        "method": "Evidence-based scoring (NO keyword heuristics)",
+        "metrics_computed": [
+          "cross_team_entropy",
+          "source_diversity",
+          "no_reply_rate",
+          "author_gini",
+          "customer_density",
+          "temporal_span_days",
+          "reaction_rate"
+        ],
+        "severity_method": "Weighted metric combination (customer_density x cross_team, author_gini, no_reply_rate)",
+        "type_method": "Dominant metric signal (highest computed score wins)",
+        "patterns_surfaced": 11,
+        "patterns_pruned": 4,
+        "duration_seconds": 0.296
       }
     ],
-    "total_duration_seconds": 17.968
+    "total_duration_seconds": 30.854,
+    "pruned_clusters": [
+      {
+        "cluster_id": 2,
+        "size": 5369,
+        "reason": "unstable (stability 45% < 50% threshold)",
+        "stability": 0.449
+      },
+      {
+        "cluster_id": 14,
+        "size": 1138,
+        "reason": "unstable (stability 47% < 50% threshold)",
+        "stability": 0.469
+      },
+      {
+        "cluster_id": 12,
+        "size": 888,
+        "reason": "unstable (stability 25% < 50% threshold)",
+        "stability": 0.253
+      },
+      {
+        "cluster_id": 0,
+        "size": 248,
+        "reason": "unstable (stability 7% < 50% threshold)",
+        "stability": 0.073
+      }
+    ]
   },
   "cards": [
     {
-      "id": "PAT-2250B1",
-      "title": "Customer Data References in Open Channels",
-      "description": "Cluster of 4044 documents containing customer-specific data references (IDs, issues, data handling). Detected across 30 products. Risk: customer PII and issue details in unsecured communication channels.",
-      "type": "compliance",
-      "confidence": "HIGH",
-      "confidence_score": 0.92,
-      "severity": "critical",
-      "top_phrases": [
-        "data",
-        "issue",
-        "cust",
-        "model",
-        "customer",
-        "cause"
-      ],
-      "occurrence": "Found in 5,787 of 37,064 documents (15.6%)",
-      "effect": "Pattern spans 30 product teams with 2566 messages, 0 transcripts, 23 docs.",
-      "evidence": {
-        "source_count": 5787,
-        "source_breakdown": {
-          "slack": 2566,
-          "pull_request": 1455,
-          "document": 23
-        },
-        "sample_messages": [
-          "Sounds good, George. One more thing, in the Security and Authentication section, should we mention any specific compliance standards we're aiming to meet, like GDPR or CCPA? This could be important fo",
-          "I agree with @eid_8658e19c. Their NLP capabilities are impressive, but I wonder how they handle privacy concerns with all that data processing. \ud83e\udd14",
-          "TensorFlow's focus on model training efficiency is interesting. While our primary goal is ingestion, their methods for handling data efficiently could be beneficial. We might find some useful patterns",
-          "First up, we have Mattermost's integration of webhooks for third-party app interactions. This feature allows Mattermost to exchange data in real-time with other applications. You can check out the PR ",
-          "Thanks, Julia! The Mattermost approach seems pretty straightforward and could be a good reference for setting up our endpoints. Real-time data exchange is crucial for us too. I think we should definit"
-        ],
-        "affected_products": [
-          "ActionGenie",
-          "AnomalyForce",
-          "AutoTuneForce",
-          "CoachForce",
-          "CollaborateForce",
-          "CollaborationForce",
-          "ConnectForce",
-          "ContentForce",
-          "ContextForce",
-          "EdgeForce",
-          "ExplainabilityForce",
-          "FeedbackForce",
-          "FlowForce",
-          "ForecastForce",
-          "InsightForce",
-          "KnowledgeForce",
-          "LeadForce",
-          "MonitorForce",
-          "PersonalizeForce",
-          "PitchForce",
-          "ProposalForce",
-          "SearchFlow",
-          "SearchForce",
-          "SecurityForce",
-          "SentimentForce",
-          "SummarizeForce",
-          "SupportForce",
-          "TrendForce",
-          "VizForce",
-          "WorkFlowGenie"
-        ],
-        "affected_teams": [
-          "planning-onForceX",
-          "develop-ianmiller-ActionGenie",
-          "develop-emmajones-ActionGenie",
-          "bug-ianmiller-ActionGenie",
-          "bug-charliegarcia-ActionGenie"
-        ],
-        "time_range": "2026-01-26 to 2027-07-14"
-      },
-      "sample_snippets": [
-        "Sounds good, George. One more thing, in the Security and Authentication section, should we mention a",
-        "I agree with @eid_8658e19c. Their NLP capabilities are impressive, but I wonder how they handle priv"
-      ],
-      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
-      "recommendation": "Implement DLP scanning on Slack channels. Route customer-specific discussions to private channels with access controls.",
-      "computation": {
-        "cluster_id": 6,
-        "cluster_size": 5787,
-        "method": "TF-IDF + KMeans",
-        "top_tfidf_terms": [
-          "data",
-          "issue",
-          "cust",
-          "model",
-          "customer",
-          "cause"
-        ]
-      }
-    },
-    {
-      "id": "PAT-543C52",
-      "title": "API/Integration Work Siloed Across Teams",
-      "description": "1745 documents about API development and integration architecture. Each product team building API layers independently without shared standards or components.",
+      "id": "PAT-3C3E4F",
+      "title": "Programming / Programming Interface",
+      "description": "Cluster of 1,800 documents across 30 products. Cross-team entropy: 0.97. Author concentration (Gini): 0.48. Customer references: 0.000/doc.",
       "type": "communication",
-      "confidence": "LOW",
-      "confidence_score": 0.59,
+      "confidence": "HIGH",
+      "confidence_score": 0.8,
       "severity": "high",
+      "severity_reasoning": "Computed severity score: 2.0/5.0. Based on: customer density (0.000), cross-team entropy (0.97), author Gini (0.48), no-reply rate (100%).",
       "top_phrases": [
         "api",
         "programming",
+        "programming interface",
+        "api application",
         "api application programming",
-        "application programming",
-        "application programming interface",
-        "programming interface"
+        "application programming"
       ],
-      "occurrence": "Found in 1,745 of 37,064 documents (4.7%)",
-      "effect": "Pattern spans 30 product teams with 1328 messages, 0 transcripts, 0 docs.",
+      "occurrence": "1,800 of 37,064 documents (4.9%)",
+      "effect": "Spans 30 products, 304 authors, 535 days. Sources: {'slack': 1373, 'pull_request': 425, 'document': 2}.",
       "evidence": {
-        "source_count": 1745,
+        "source_count": 1800,
         "source_breakdown": {
-          "slack": 1328,
-          "pull_request": 417
+          "slack": 1373,
+          "pull_request": 425,
+          "document": 2
         },
         "sample_messages": [
           "Great points, both of you! Next, let's look at Rocket.Chat's real-time event API integration. This feature facilitates seamless interactions with external applications. Here's the PR link: https://git",
           "Thanks for the input, everyone! I'll take a closer look at these features and see how we can adapt some of their strategies for our Slack Events API integration. I'll keep you all updated on my findin",
-          "Alright, I've gone through the changes. The Slack Events API integration looks solid, and I can see that the endpoints are correctly set up to handle incoming events. Nice work! \ud83d\udc4d"
+          "Alright, I've gone through the changes. The Slack Events API integration looks solid, and I can see that the endpoints are correctly set up to handle incoming events. Nice work! \ud83d\udc4d",
+          "Sure, I can provide some context. The new direction focuses on enhancing our core features rather than expanding third-party integrations. The Slack Events API integration was meant to support interac"
         ],
         "affected_products": [
           "ActionGenie",
@@ -265,64 +247,130 @@
           "WorkFlowGenie"
         ],
         "affected_teams": [
-          "develop-ianmiller-ActionGenie",
-          "develop-emmajones-ActionGenie",
-          "bug-ianmiller-ActionGenie",
-          "bug-charliegarcia-ActionGenie",
-          "bug-emmajones-ActionGenie"
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce"
         ],
+        "customers_referenced": [],
         "time_range": "2026-01-21 to 2027-07-10"
+      },
+      "metrics": {
+        "cross_team_entropy": {
+          "value": 0.969,
+          "method": "Shannon entropy of product distribution, normalized to [0,1]",
+          "interpretation": "1.0 = evenly distributed across all products, 0.0 = single product"
+        },
+        "source_diversity": {
+          "value": 0.75,
+          "method": "Unique source types / 4 (slack, transcript, document, PR)",
+          "interpretation": "1.0 = present in all source types"
+        },
+        "no_reply_rate": {
+          "value": 1.0,
+          "method": "Fraction of Slack messages with 0 thread replies",
+          "interpretation": "Higher = less engagement / potential communication gap"
+        },
+        "avg_thread_depth": {
+          "value": 0.0,
+          "method": "Mean thread reply count for Slack messages in cluster"
+        },
+        "author_gini": {
+          "value": 0.478,
+          "method": "Gini coefficient of message authorship distribution",
+          "interpretation": "Higher = more concentrated (fewer authors dominating)"
+        },
+        "unique_authors": {
+          "value": 304,
+          "method": "Count of distinct user IDs in cluster"
+        },
+        "customer_density": {
+          "value": 0.0,
+          "method": "Customer name mentions per document in cluster"
+        },
+        "customers_referenced": {
+          "value": [],
+          "method": "Customer names found via relational join with customer master data"
+        },
+        "temporal_span_days": {
+          "value": 535,
+          "method": "Days between earliest and latest timestamped document"
+        },
+        "reaction_rate": {
+          "value": 0.0,
+          "method": "Fraction of messages with emoji reactions"
+        },
+        "product_count": {
+          "value": 30,
+          "method": "Distinct products represented in cluster"
+        }
+      },
+      "metric_signals": {
+        "compliance": 1.0,
+        "bottleneck": 3.43,
+        "communication": 4.41,
+        "anomaly": 2.0
       },
       "sample_snippets": [
         "Great points, both of you! Next, let's look at Rocket.Chat's real-time event API integration. This f",
         "Thanks for the input, everyone! I'll take a closer look at these features and see how we can adapt s"
       ],
-      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
-      "recommendation": "Establish API governance council. Create shared API design guidelines and reusable SDK components across product teams.",
+      "caveats": "Confidence 80% = stability (96%) x silhouette (0.068). Cluster stability tested across 10 bootstrap runs. Severity computed from metrics, not keyword matching.",
+      "recommendation": "Investigate 1,800 documents. Dominant metric signal: communication (4.4). Top phrases: api, programming, programming interface.",
       "computation": {
-        "cluster_id": 1,
-        "cluster_size": 1745,
+        "cluster_id": 11,
+        "cluster_size": 1800,
         "method": "TF-IDF + KMeans",
+        "silhouette": 0.0678,
+        "stability": {
+          "mean": 0.958,
+          "std": 0.024,
+          "min": 0.919,
+          "max": 0.994,
+          "stable": true
+        },
+        "severity_score": 2.02,
         "top_tfidf_terms": [
           "api",
           "programming",
+          "programming interface",
+          "api application",
           "api application programming",
-          "application programming",
-          "application programming interface",
-          "programming interface"
+          "application programming"
         ]
       }
     },
     {
-      "id": "PAT-926147",
-      "title": "Pull Request Discussion Outside Review Tools",
-      "description": "3510 PR-related discussions happening in Slack instead of in the PR review tool. Decisions and context lost outside the code review system.",
-      "type": "anomaly",
+      "id": "PAT-B482FE",
+      "title": "Pr Pull Request / Pr Pull",
+      "description": "Cluster of 3,951 documents across 30 products. Cross-team entropy: 0.99. Author concentration (Gini): 0.39. Customer references: 0.000/doc.",
+      "type": "communication",
       "confidence": "HIGH",
-      "confidence_score": 0.83,
-      "severity": "medium",
+      "confidence_score": 0.72,
+      "severity": "high",
+      "severity_reasoning": "Computed severity score: 2.0/5.0. Based on: customer density (0.000), cross-team entropy (0.99), author Gini (0.39), no-reply rate (100%).",
       "top_phrases": [
         "pr",
-        "pr pull",
         "pr pull request",
+        "pr pull",
         "pull request",
         "pull",
         "request"
       ],
-      "occurrence": "Found in 4,692 of 37,064 documents (12.7%)",
-      "effect": "Pattern spans 30 product teams with 3231 messages, 0 transcripts, 0 docs.",
+      "occurrence": "3,951 of 37,064 documents (10.7%)",
+      "effect": "Spans 30 products, 378 authors, 476 days. Sources: {'slack': 3711, 'pull_request': 240}.",
       "evidence": {
-        "source_count": 4692,
+        "source_count": 3951,
         "source_breakdown": {
-          "slack": 3231,
-          "pull_request": 279
+          "slack": 3711,
+          "pull_request": 240
         },
         "sample_messages": [
+          "First up, we have Mattermost's integration of webhooks for third-party app interactions. This feature allows Mattermost to exchange data in real-time with other applications. You can check out the PR ",
           "Absolutely, Bob! Lastly, we have Zulip's enhancement of their bot framework to handle events from external services. This improves automation and integration capabilities. Check out the PR here: https",
           "Great points, @eid_49aa3b00 and Charlie! Next up is TensorFlow's feature. They have a PR titled 'Efficient Data Pipeline for Model Training' which enhances data handling efficiency during model traini",
-          "Agreed, both of you. Lastly, let's look at Apache Airflow's feature. They have a PR titled 'Dynamic Task Scheduling for Data Pipelines' which adds dynamic scheduling capabilities. Here's the link: htt",
-          "Hi team, please check my PR for integrating the Slack Events API: https://github.com/salesforce/onForceX/pull/1. This will allow onForceX to interact with third-party Slack apps by setting up the nece",
-          "Hi team, please check my PR for the new data ingestion pipeline: https://github.com/salesforce/onForceX/pull/3. \ud83d\ude80 This PR introduces a pipeline to efficiently process incoming data for AI model update"
+          "Agreed, both of you. Lastly, let's look at Apache Airflow's feature. They have a PR titled 'Dynamic Task Scheduling for Data Pipelines' which adds dynamic scheduling capabilities. Here's the link: htt"
         ],
         "affected_products": [
           "ActionGenie",
@@ -357,28 +405,98 @@
           "WorkFlowGenie"
         ],
         "affected_teams": [
-          "develop-ianmiller-ActionGenie",
-          "develop-emmajones-ActionGenie",
-          "bug-ianmiller-ActionGenie",
-          "bug-charliegarcia-ActionGenie",
-          "bug-emmajones-ActionGenie"
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce"
+        ],
+        "customers_referenced": [
+          "BlueWave"
         ],
         "time_range": "2026-03-20 to 2027-07-10"
       },
+      "metrics": {
+        "cross_team_entropy": {
+          "value": 0.99,
+          "method": "Shannon entropy of product distribution, normalized to [0,1]",
+          "interpretation": "1.0 = evenly distributed across all products, 0.0 = single product"
+        },
+        "source_diversity": {
+          "value": 0.5,
+          "method": "Unique source types / 4 (slack, transcript, document, PR)",
+          "interpretation": "1.0 = present in all source types"
+        },
+        "no_reply_rate": {
+          "value": 1.0,
+          "method": "Fraction of Slack messages with 0 thread replies",
+          "interpretation": "Higher = less engagement / potential communication gap"
+        },
+        "avg_thread_depth": {
+          "value": 0.0,
+          "method": "Mean thread reply count for Slack messages in cluster"
+        },
+        "author_gini": {
+          "value": 0.394,
+          "method": "Gini coefficient of message authorship distribution",
+          "interpretation": "Higher = more concentrated (fewer authors dominating)"
+        },
+        "unique_authors": {
+          "value": 378,
+          "method": "Count of distinct user IDs in cluster"
+        },
+        "customer_density": {
+          "value": 0.0,
+          "method": "Customer name mentions per document in cluster"
+        },
+        "customers_referenced": {
+          "value": [
+            "BlueWave"
+          ],
+          "method": "Customer names found via relational join with customer master data"
+        },
+        "temporal_span_days": {
+          "value": 476,
+          "method": "Days between earliest and latest timestamped document"
+        },
+        "reaction_rate": {
+          "value": 0.0,
+          "method": "Fraction of messages with emoji reactions"
+        },
+        "product_count": {
+          "value": 30,
+          "method": "Distinct products represented in cluster"
+        }
+      },
+      "metric_signals": {
+        "compliance": 1.0,
+        "bottleneck": 3.18,
+        "communication": 3.97,
+        "anomaly": 2.0
+      },
       "sample_snippets": [
-        "Absolutely, Bob! Lastly, we have Zulip's enhancement of their bot framework to handle events from ex",
-        "Great points, @eid_49aa3b00 and Charlie! Next up is TensorFlow's feature. They have a PR titled 'Eff"
+        "First up, we have Mattermost's integration of webhooks for third-party app interactions. This featur",
+        "Absolutely, Bob! Lastly, we have Zulip's enhancement of their bot framework to handle events from ex"
       ],
-      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
-      "recommendation": "Link Slack PR discussions back to GitHub/GitLab PR comments. Ensure all technical decisions are captured in the review tool, not just Slack.",
+      "caveats": "Confidence 72% = stability (86%) x silhouette (0.008). Cluster stability tested across 10 bootstrap runs. Severity computed from metrics, not keyword matching.",
+      "recommendation": "Investigate 3,951 documents. Dominant metric signal: communication (4.0). Top phrases: pr, pr pull request, pr pull.",
       "computation": {
-        "cluster_id": 12,
-        "cluster_size": 4692,
+        "cluster_id": 13,
+        "cluster_size": 3951,
         "method": "TF-IDF + KMeans",
+        "silhouette": 0.0076,
+        "stability": {
+          "mean": 0.864,
+          "std": 0.063,
+          "min": 0.755,
+          "max": 0.978,
+          "stable": true
+        },
+        "severity_score": 1.99,
         "top_tfidf_terms": [
           "pr",
-          "pr pull",
           "pr pull request",
+          "pr pull",
           "pull request",
           "pull",
           "request"
@@ -386,215 +504,37 @@
       }
     },
     {
-      "id": "PAT-1555C1",
-      "title": "Hi Team / Team",
-      "description": "Cluster of 989 documents sharing phrases: hi team, hi, team, open source, source. Found across 30 products and 1 source types.",
-      "type": "anomaly",
-      "confidence": "LOW",
-      "confidence_score": 0.53,
-      "severity": "medium",
-      "top_phrases": [
-        "hi team",
-        "hi",
-        "team",
-        "open source",
-        "source",
-        "discuss"
-      ],
-      "occurrence": "Found in 989 of 37,064 documents (2.7%)",
-      "effect": "Pattern spans 30 product teams with 989 messages, 0 transcripts, 0 docs.",
-      "evidence": {
-        "source_count": 989,
-        "source_breakdown": {
-          "slack": 989
-        },
-        "sample_messages": [
-          "Hi team, I've shared the <https://sf-internal.slack.com/archives/docs/onforcex_market_research_report|Market Research Report> for onForceX. Let's discuss and refine it together. Looking forward to you",
-          "Hi team, I wanted to discuss the Market Research Report on X-Genie. It's pretty interesting and I think we can learn a lot from it. \ud83d\udcca",
-          "Hi team, I've shared the <https://sf-internal.slack.com/archives/docs/onforcex_product_vision_document|Product Vision Document> for onForceX. Let's discuss and refine it to ensure it aligns with our s"
-        ],
-        "affected_products": [
-          "ActionGenie",
-          "AnomalyForce",
-          "AutoTuneForce",
-          "CoachForce",
-          "CollaborateForce",
-          "CollaborationForce",
-          "ConnectForce",
-          "ContentForce",
-          "ContextForce",
-          "EdgeForce",
-          "ExplainabilityForce",
-          "FeedbackForce",
-          "FlowForce",
-          "ForecastForce",
-          "InsightForce",
-          "KnowledgeForce",
-          "LeadForce",
-          "MonitorForce",
-          "PersonalizeForce",
-          "PitchForce",
-          "ProposalForce",
-          "SearchFlow",
-          "SearchForce",
-          "SecurityForce",
-          "SentimentForce",
-          "SummarizeForce",
-          "SupportForce",
-          "TrendForce",
-          "VizForce",
-          "WorkFlowGenie"
-        ],
-        "affected_teams": [
-          "planning-onForceX",
-          "develop-ianmiller-ActionGenie",
-          "develop-emmajones-ActionGenie",
-          "bug-ianmiller-ActionGenie",
-          "bug-davidwilliams-ActionGenie"
-        ],
-        "time_range": "2026-01-16 to 2027-07-10"
-      },
-      "sample_snippets": [
-        "Hi team, I've shared the <https://sf-internal.slack.com/archives/docs/onforcex_market_research_repor",
-        "Hi team, I wanted to discuss the Market Research Report on X-Genie. It's pretty interesting and I th"
-      ],
-      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
-      "recommendation": "Review the 989 documents in this cluster for actionable patterns. Top signal phrases: hi team, hi, team.",
-      "computation": {
-        "cluster_id": 14,
-        "cluster_size": 989,
-        "method": "TF-IDF + KMeans",
-        "top_tfidf_terms": [
-          "hi team",
-          "hi",
-          "team",
-          "open source",
-          "source",
-          "discuss"
-        ]
-      }
-    },
-    {
-      "id": "PAT-4A57A4",
-      "title": "Informal Approval Patterns (LGTM Culture)",
-      "description": "797 instances of informal approval language ('LGTM', 'approved') without formal review workflows. Approvals happen in Slack rather than through structured review systems.",
-      "type": "approval",
-      "confidence": "LOW",
-      "confidence_score": 0.51,
-      "severity": "medium",
-      "top_phrases": [
-        "approved",
-        "lgtm",
-        "lgtm approved",
-        "looks",
-        "criteria",
-        "looks good"
-      ],
-      "occurrence": "Found in 797 of 37,064 documents (2.2%)",
-      "effect": "Pattern spans 30 product teams with 797 messages, 0 transcripts, 0 docs.",
-      "evidence": {
-        "source_count": 797,
-        "source_breakdown": {
-          "slack": 797
-        },
-        "sample_messages": [
-          "Everything looks good to me. LGTM, approved! \u2705",
-          "Yep, I can confirm that too. The integration looks seamless. LGTM, approved! \u2705",
-          "Great to hear! I just went through the code and the documentation. Everything looks solid to me. The alerting system is well-configured, and the error handling is comprehensive. LGTM, approved! \ud83d\udc4d"
-        ],
-        "affected_products": [
-          "ActionGenie",
-          "AnomalyForce",
-          "AutoTuneForce",
-          "CoachForce",
-          "CollaborateForce",
-          "CollaborationForce",
-          "ConnectForce",
-          "ContentForce",
-          "ContextForce",
-          "EdgeForce",
-          "ExplainabilityForce",
-          "FeedbackForce",
-          "FlowForce",
-          "ForecastForce",
-          "InsightForce",
-          "KnowledgeForce",
-          "LeadForce",
-          "MonitorForce",
-          "PersonalizeForce",
-          "PitchForce",
-          "ProposalForce",
-          "SearchFlow",
-          "SearchForce",
-          "SecurityForce",
-          "SentimentForce",
-          "SummarizeForce",
-          "SupportForce",
-          "TrendForce",
-          "VizForce",
-          "WorkFlowGenie"
-        ],
-        "affected_teams": [
-          "develop-ianmiller-ActionGenie",
-          "develop-emmajones-ActionGenie",
-          "bug-davidwilliams-ActionGenie",
-          "develop-georgegarcia-AnomalyForce",
-          "develop-fionabrown-AnomalyForce"
-        ],
-        "time_range": "2026-03-14 to 2027-04-19"
-      },
-      "sample_snippets": [
-        "Everything looks good to me. LGTM, approved! \u2705",
-        "Yep, I can confirm that too. The integration looks seamless. LGTM, approved! \u2705"
-      ],
-      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
-      "recommendation": "Implement required approval workflows in CI/CD. LGTM in Slack should trigger formal review tool approval, not replace it.",
-      "computation": {
-        "cluster_id": 9,
-        "cluster_size": 797,
-        "method": "TF-IDF + KMeans",
-        "top_tfidf_terms": [
-          "approved",
-          "lgtm",
-          "lgtm approved",
-          "looks",
-          "criteria",
-          "looks good"
-        ]
-      }
-    },
-    {
-      "id": "PAT-46B914",
-      "title": "Positive Sentiment Clustering (Baseline)",
-      "description": "12194 documents with positive/forward-looking language. Serves as sentiment baseline \u2014 deviation from this pattern could indicate team morale issues.",
-      "type": "anomaly",
-      "confidence": "HIGH",
-      "confidence_score": 0.95,
-      "severity": "low",
+      "id": "PAT-4A21F0",
+      "title": "User / Think / Great",
+      "description": "Cluster of 12,002 documents across 30 products. Cross-team entropy: 0.99. Author concentration (Gini): 0.37. Customer references: 0.000/doc.",
+      "type": "communication",
+      "confidence": "MEDIUM",
+      "confidence_score": 0.62,
+      "severity": "high",
+      "severity_reasoning": "Computed severity score: 2.5/5.0. Based on: customer density (0.000), cross-team entropy (0.99), author Gini (0.37), no-reply rate (100%).",
       "top_phrases": [
         "user",
-        "great",
         "think",
+        "great",
         "good",
-        "help",
-        "agree"
+        "sounds",
+        "maybe"
       ],
-      "occurrence": "Found in 13,099 of 37,064 documents (35.3%)",
-      "effect": "Pattern spans 30 product teams with 10948 messages, 36 transcripts, 49 docs.",
+      "occurrence": "12,002 of 37,064 documents (32.4%)",
+      "effect": "Spans 30 products, 516 authors, 546 days. Sources: {'slack': 10781, 'transcript': 22, 'document': 10, 'pull_request': 1189}.",
       "evidence": {
-        "source_count": 13099,
+        "source_count": 12002,
         "source_breakdown": {
-          "slack": 10948,
-          "transcript": 36,
-          "document": 49,
-          "pull_request": 1161
+          "slack": 10781,
+          "transcript": 22,
+          "document": 10,
+          "pull_request": 1189
         },
         "sample_messages": [
           "Thanks for sharing, Charlie! @eid_13fdff84 I think the Executive Summary is clear, but it might benefit from a bit more detail on the specific AI technologies used. This could help differentiate us fr",
           "Good point, Emma. Also, in the Market Overview section, it might be helpful to include some recent statistics or trends about the growth of AI in collaboration tools. This could strengthen our argumen",
           "I agree with George. Adding some data could really bolster the Market Overview. Additionally, in the Target Audience section, maybe we could specify more about the size of businesses we're targeting. ",
-          "Sounds good, @eid_fd8cecea. Looking forward to it! \ud83d\udc4d",
-          "Looking forward to it! Thanks for the great discussion, everyone. \ud83d\ude0a"
+          "The Competitive Analysis is solid, but maybe we could add a bit more about our unique selling proposition. What makes our AI suggestions more contextually relevant than others? This could be a key dif"
         ],
         "affected_products": [
           "ActionGenie",
@@ -629,63 +569,140 @@
           "WorkFlowGenie"
         ],
         "affected_teams": [
-          "planning-onForceX",
-          "develop-emmamiller-ActionGenie",
-          "develop-charliegarcia-ActionGenie",
-          "develop-davidwilliams-ActionGenie",
-          "develop-georgebrown-ActionGenie"
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce"
+        ],
+        "customers_referenced": [
+          "SmartData",
+          "TechCorp",
+          "DataSolutions"
         ],
         "time_range": "2026-01-16 to 2027-07-16"
+      },
+      "metrics": {
+        "cross_team_entropy": {
+          "value": 0.995,
+          "method": "Shannon entropy of product distribution, normalized to [0,1]",
+          "interpretation": "1.0 = evenly distributed across all products, 0.0 = single product"
+        },
+        "source_diversity": {
+          "value": 1.0,
+          "method": "Unique source types / 4 (slack, transcript, document, PR)",
+          "interpretation": "1.0 = present in all source types"
+        },
+        "no_reply_rate": {
+          "value": 1.0,
+          "method": "Fraction of Slack messages with 0 thread replies",
+          "interpretation": "Higher = less engagement / potential communication gap"
+        },
+        "avg_thread_depth": {
+          "value": 0.0,
+          "method": "Mean thread reply count for Slack messages in cluster"
+        },
+        "author_gini": {
+          "value": 0.371,
+          "method": "Gini coefficient of message authorship distribution",
+          "interpretation": "Higher = more concentrated (fewer authors dominating)"
+        },
+        "unique_authors": {
+          "value": 516,
+          "method": "Count of distinct user IDs in cluster"
+        },
+        "customer_density": {
+          "value": 0.0,
+          "method": "Customer name mentions per document in cluster"
+        },
+        "customers_referenced": {
+          "value": [
+            "SmartData",
+            "TechCorp",
+            "DataSolutions"
+          ],
+          "method": "Customer names found via relational join with customer master data"
+        },
+        "temporal_span_days": {
+          "value": 546,
+          "method": "Days between earliest and latest timestamped document"
+        },
+        "reaction_rate": {
+          "value": 0.0,
+          "method": "Fraction of messages with emoji reactions"
+        },
+        "product_count": {
+          "value": 30,
+          "method": "Distinct products represented in cluster"
+        }
+      },
+      "metric_signals": {
+        "compliance": 1.0,
+        "bottleneck": 3.11,
+        "communication": 4.98,
+        "anomaly": 2.0
       },
       "sample_snippets": [
         "Thanks for sharing, Charlie! @eid_13fdff84 I think the Executive Summary is clear, but it might bene",
         "Good point, Emma. Also, in the Market Overview section, it might be helpful to include some recent s"
       ],
-      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
-      "recommendation": "Use as baseline for sentiment monitoring. Track ratio of positive vs. concern-bearing messages over time.",
+      "caveats": "Confidence 62% = stability (70%) x silhouette (-0.004). Cluster stability tested across 10 bootstrap runs. Severity computed from metrics, not keyword matching.",
+      "recommendation": "Investigate 12,002 documents. Dominant metric signal: communication (5.0). Top phrases: user, think, great.",
       "computation": {
-        "cluster_id": 7,
-        "cluster_size": 13099,
+        "cluster_id": 6,
+        "cluster_size": 12002,
         "method": "TF-IDF + KMeans",
+        "silhouette": -0.004,
+        "stability": {
+          "mean": 0.703,
+          "std": 0.123,
+          "min": 0.569,
+          "max": 0.922,
+          "stable": true
+        },
+        "severity_score": 2.48,
         "top_tfidf_terms": [
           "user",
-          "great",
           "think",
+          "great",
           "good",
-          "help",
-          "agree"
+          "sounds",
+          "maybe"
         ]
       }
     },
     {
-      "id": "PAT-9D8772",
-      "title": "Information Sharing Patterns",
-      "description": "4644 documents with information-sharing language. Healthy communication baseline indicating active knowledge transfer.",
+      "id": "PAT-F59A3D",
+      "title": "Data / Time / Processing",
+      "description": "Cluster of 5,384 documents across 30 products. Cross-team entropy: 1.00. Author concentration (Gini): 0.51. Customer references: 0.000/doc.",
       "type": "communication",
-      "confidence": "HIGH",
-      "confidence_score": 0.95,
-      "severity": "low",
+      "confidence": "MEDIUM",
+      "confidence_score": 0.58,
+      "severity": "high",
+      "severity_reasoning": "Computed severity score: 2.0/5.0. Based on: customer density (0.000), cross-team entropy (1.00), author Gini (0.51), no-reply rate (100%).",
       "top_phrases": [
-        "ll",
-        "thanks",
-        "let",
-        "posted",
-        "review",
-        "ll posted"
+        "data",
+        "time",
+        "processing",
+        "real time",
+        "real",
+        "model"
       ],
-      "occurrence": "Found in 7,450 of 37,064 documents (20.1%)",
-      "effect": "Pattern spans 30 product teams with 4644 messages, 0 transcripts, 0 docs.",
+      "occurrence": "5,384 of 37,064 documents (14.5%)",
+      "effect": "Spans 30 products, 449 authors, 546 days. Sources: {'slack': 3287, 'document': 388, 'pull_request': 1708, 'transcript': 1}.",
       "evidence": {
-        "source_count": 7450,
+        "source_count": 5384,
         "source_breakdown": {
-          "slack": 4644
+          "slack": 3287,
+          "document": 388,
+          "pull_request": 1708,
+          "transcript": 1
         },
         "sample_messages": [
-          "Great suggestions, everyone! @eid_d96fb219, I'll add more details about the AI technologies. @eid_ec3b5d65 and @eid_2589c967, I'll look for some recent stats and clarify the target business size. Any ",
-          "Thanks for the insights, team! I'll incorporate these changes: add AI tech details, include market stats, specify target business size, highlight our unique selling points, and expand on partnerships ",
-          "Sounds good, @Emma Miller. I'll start drafting some notes on potential improvements we can make. \ud83d\udcdd",
-          "Same here! Let's make our product even better. \ud83d\udcaa",
-          "Great work on collaborating with the design team, @eid_af89b40b! I'll focus on how the feedback from accessibility testing has been incorporated. Let's make sure everything's spot on! \ud83d\ude80"
+          "@here Explore the capabilities of the spaCy library, a powerful tool for natural language processing that can be used to build features like onForceX's smart action suggestions. https://github.com/exp",
+          "Sounds good, George. One more thing, in the Security and Authentication section, should we mention any specific compliance standards we're aiming to meet, like GDPR or CCPA? This could be important fo",
+          "I agree with @eid_fd8cecea. The integration with Spaces discussions is a unique feature. It could really set them apart. But I'm curious about how they handle data privacy. \ud83e\udd14",
+          "Yeah, @eid_4df5d4b7, I noticed that too. They seem to have a strong focus on natural language processing for understanding context in DMs and group chats."
         ],
         "affected_products": [
           "ActionGenie",
@@ -720,61 +737,129 @@
           "WorkFlowGenie"
         ],
         "affected_teams": [
-          "planning-onForceX",
-          "develop-ianmiller-ActionGenie",
-          "develop-emmajones-ActionGenie",
-          "bug-ianmiller-ActionGenie",
-          "bug-charliegarcia-ActionGenie"
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce"
         ],
+        "customers_referenced": [],
         "time_range": "2026-01-16 to 2027-07-16"
       },
+      "metrics": {
+        "cross_team_entropy": {
+          "value": 0.996,
+          "method": "Shannon entropy of product distribution, normalized to [0,1]",
+          "interpretation": "1.0 = evenly distributed across all products, 0.0 = single product"
+        },
+        "source_diversity": {
+          "value": 1.0,
+          "method": "Unique source types / 4 (slack, transcript, document, PR)",
+          "interpretation": "1.0 = present in all source types"
+        },
+        "no_reply_rate": {
+          "value": 1.0,
+          "method": "Fraction of Slack messages with 0 thread replies",
+          "interpretation": "Higher = less engagement / potential communication gap"
+        },
+        "avg_thread_depth": {
+          "value": 0.0,
+          "method": "Mean thread reply count for Slack messages in cluster"
+        },
+        "author_gini": {
+          "value": 0.513,
+          "method": "Gini coefficient of message authorship distribution",
+          "interpretation": "Higher = more concentrated (fewer authors dominating)"
+        },
+        "unique_authors": {
+          "value": 449,
+          "method": "Count of distinct user IDs in cluster"
+        },
+        "customer_density": {
+          "value": 0.0,
+          "method": "Customer name mentions per document in cluster"
+        },
+        "customers_referenced": {
+          "value": [],
+          "method": "Customer names found via relational join with customer master data"
+        },
+        "temporal_span_days": {
+          "value": 546,
+          "method": "Days between earliest and latest timestamped document"
+        },
+        "reaction_rate": {
+          "value": 0.0,
+          "method": "Fraction of messages with emoji reactions"
+        },
+        "product_count": {
+          "value": 30,
+          "method": "Distinct products represented in cluster"
+        }
+      },
+      "metric_signals": {
+        "compliance": 1.0,
+        "bottleneck": 3.54,
+        "communication": 4.99,
+        "anomaly": 2.0
+      },
       "sample_snippets": [
-        "Great suggestions, everyone! @eid_d96fb219, I'll add more details about the AI technologies. @eid_ec",
-        "Thanks for the insights, team! I'll incorporate these changes: add AI tech details, include market s"
+        "@here Explore the capabilities of the spaCy library, a powerful tool for natural language processing",
+        "Sounds good, George. One more thing, in the Security and Authentication section, should we mention a"
       ],
-      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
-      "recommendation": "No action needed \u2014 healthy communication pattern. Monitor for decline as early warning of knowledge silo formation.",
+      "caveats": "Confidence 58% = stability (63%) x silhouette (0.002). Cluster stability tested across 10 bootstrap runs. Severity computed from metrics, not keyword matching.",
+      "recommendation": "Investigate 5,384 documents. Dominant metric signal: communication (5.0). Top phrases: data, time, processing.",
       "computation": {
-        "cluster_id": 10,
-        "cluster_size": 7450,
+        "cluster_id": 8,
+        "cluster_size": 5384,
         "method": "TF-IDF + KMeans",
+        "silhouette": 0.0021,
+        "stability": {
+          "mean": 0.63,
+          "std": 0.259,
+          "min": 0.242,
+          "max": 0.916,
+          "stable": true
+        },
+        "severity_score": 2.05,
         "top_tfidf_terms": [
-          "ll",
-          "thanks",
-          "let",
-          "posted",
-          "review",
-          "ll posted"
+          "data",
+          "time",
+          "processing",
+          "real time",
+          "real",
+          "model"
         ]
       }
     },
     {
-      "id": "PAT-C418CA",
-      "title": "Request/Response Communication Patterns",
-      "description": "1024 question-and-response exchanges. Normal operational communication \u2014 useful as baseline for measuring response time patterns.",
+      "id": "PAT-CF1A4F",
+      "title": "Let Know / Know",
+      "description": "Cluster of 1,452 documents across 30 products. Cross-team entropy: 1.00. Author concentration (Gini): 0.43. Customer references: 0.000/doc.",
       "type": "communication",
-      "confidence": "LOW",
-      "confidence_score": 0.53,
-      "severity": "low",
+      "confidence": "MEDIUM",
+      "confidence_score": 0.57,
+      "severity": "high",
+      "severity_reasoning": "Computed severity score: 1.5/5.0. Based on: customer density (0.000), cross-team entropy (1.00), author Gini (0.43), no-reply rate (100%).",
       "top_phrases": [
         "let know",
         "know",
         "let",
-        "let know need",
-        "know need",
-        "need"
+        "looking forward",
+        "forward",
+        "let know need"
       ],
-      "occurrence": "Found in 1,024 of 37,064 documents (2.8%)",
-      "effect": "Pattern spans 30 product teams with 1024 messages, 0 transcripts, 0 docs.",
+      "occurrence": "1,452 of 37,064 documents (3.9%)",
+      "effect": "Spans 30 products, 377 authors, 546 days. Sources: {'slack': 1452}.",
       "evidence": {
-        "source_count": 1024,
+        "source_count": 1452,
         "source_breakdown": {
-          "slack": 1024
+          "slack": 1452
         },
         "sample_messages": [
-          "Sounds good, @eid_13cb0e90. Once that's done, we can re-evaluate. Let us know if you need any help setting up the tests. \ud83d\udcaa",
-          "Sounds like a plan, Charlie! Let us know if you need any help with the investigation. Looking forward to seeing how we can enhance our microservices with these insights. \ud83d\ude0a",
-          "Sounds good, @eid_4cede092! Looking forward to the updates. Let us know if you need any help. \ud83d\ude0a"
+          "Sounds good, @eid_fd8cecea. Looking forward to it! \ud83d\udc4d",
+          "Looking forward to it! Thanks for the great discussion, everyone. \ud83d\ude0a",
+          "On it too! Looking forward to seeing how you've tackled the integration with our existing systems. \ud83d\udc4d",
+          "Sounds good, @eid_13cb0e90. Once that's done, we can re-evaluate. Let us know if you need any help setting up the tests. \ud83d\udcaa"
         ],
         "affected_products": [
           "ActionGenie",
@@ -809,42 +894,272 @@
           "WorkFlowGenie"
         ],
         "affected_teams": [
-          "develop-ianmiller-ActionGenie",
-          "develop-emmajones-ActionGenie",
-          "bug-ianmiller-ActionGenie",
-          "bug-charliegarcia-ActionGenie",
-          "bug-emmajones-ActionGenie"
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce"
         ],
-        "time_range": "2026-01-27 to 2027-07-16"
+        "customers_referenced": [],
+        "time_range": "2026-01-16 to 2027-07-16"
+      },
+      "metrics": {
+        "cross_team_entropy": {
+          "value": 0.998,
+          "method": "Shannon entropy of product distribution, normalized to [0,1]",
+          "interpretation": "1.0 = evenly distributed across all products, 0.0 = single product"
+        },
+        "source_diversity": {
+          "value": 0.25,
+          "method": "Unique source types / 4 (slack, transcript, document, PR)",
+          "interpretation": "1.0 = present in all source types"
+        },
+        "no_reply_rate": {
+          "value": 1.0,
+          "method": "Fraction of Slack messages with 0 thread replies",
+          "interpretation": "Higher = less engagement / potential communication gap"
+        },
+        "avg_thread_depth": {
+          "value": 0.0,
+          "method": "Mean thread reply count for Slack messages in cluster"
+        },
+        "author_gini": {
+          "value": 0.432,
+          "method": "Gini coefficient of message authorship distribution",
+          "interpretation": "Higher = more concentrated (fewer authors dominating)"
+        },
+        "unique_authors": {
+          "value": 377,
+          "method": "Count of distinct user IDs in cluster"
+        },
+        "customer_density": {
+          "value": 0.0,
+          "method": "Customer name mentions per document in cluster"
+        },
+        "customers_referenced": {
+          "value": [],
+          "method": "Customer names found via relational join with customer master data"
+        },
+        "temporal_span_days": {
+          "value": 546,
+          "method": "Days between earliest and latest timestamped document"
+        },
+        "reaction_rate": {
+          "value": 0.0,
+          "method": "Fraction of messages with emoji reactions"
+        },
+        "product_count": {
+          "value": 30,
+          "method": "Distinct products represented in cluster"
+        }
+      },
+      "metric_signals": {
+        "compliance": 1.0,
+        "bottleneck": 3.3,
+        "communication": 3.49,
+        "anomaly": 2.0
       },
       "sample_snippets": [
-        "Sounds good, @eid_13cb0e90. Once that's done, we can re-evaluate. Let us know if you need any help s",
-        "Sounds like a plan, Charlie! Let us know if you need any help with the investigation. Looking forwar"
+        "Sounds good, @eid_fd8cecea. Looking forward to it! \ud83d\udc4d",
+        "Looking forward to it! Thanks for the great discussion, everyone. \ud83d\ude0a"
       ],
-      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
-      "recommendation": "Track response latency trends. If 'let me know' messages increase without responses, flag as communication breakdown risk.",
+      "caveats": "Confidence 57% = stability (57%) x silhouette (0.057). Cluster stability tested across 10 bootstrap runs. Severity computed from metrics, not keyword matching.",
+      "recommendation": "Investigate 1,452 documents. Dominant metric signal: communication (3.5). Top phrases: let know, know, let.",
       "computation": {
-        "cluster_id": 4,
-        "cluster_size": 1024,
+        "cluster_id": 7,
+        "cluster_size": 1452,
         "method": "TF-IDF + KMeans",
+        "silhouette": 0.0565,
+        "stability": {
+          "mean": 0.573,
+          "std": 0.177,
+          "min": 0.365,
+          "max": 0.959,
+          "stable": true
+        },
+        "severity_score": 1.51,
         "top_tfidf_terms": [
           "let know",
           "know",
           "let",
-          "let know need",
-          "know need",
-          "need"
+          "looking forward",
+          "forward",
+          "let know need"
         ]
       }
     },
     {
-      "id": "PAT-C13A16",
-      "title": "Channel Join/Leave Churn",
-      "description": "891 channel join/leave events detected. High channel membership turnover may indicate unclear channel purpose or team restructuring.",
+      "id": "PAT-94A8C4",
+      "title": "Approved / Lgtm / Lgtm Approved",
+      "description": "Cluster of 1,226 documents across 30 products. Cross-team entropy: 0.99. Author concentration (Gini): 0.39. Customer references: 0.002/doc.",
       "type": "communication",
-      "confidence": "LOW",
-      "confidence_score": 0.52,
-      "severity": "low",
+      "confidence": "MEDIUM",
+      "confidence_score": 0.53,
+      "severity": "high",
+      "severity_reasoning": "Computed severity score: 2.0/5.0. Based on: customer density (0.002), cross-team entropy (0.99), author Gini (0.39), no-reply rate (100%).",
+      "top_phrases": [
+        "approved",
+        "lgtm",
+        "lgtm approved",
+        "appreciate quick",
+        "appreciate",
+        "quick"
+      ],
+      "occurrence": "1,226 of 37,064 documents (3.3%)",
+      "effect": "Spans 30 products, 255 authors, 437 days. Sources: {'slack': 1226}.",
+      "evidence": {
+        "source_count": 1226,
+        "source_breakdown": {
+          "slack": 1226
+        },
+        "sample_messages": [
+          "Thanks, @eid_4bcfb482 and Hannah! Appreciate the quick review and feedback. I'll merge it now. \ud83d\ude0a",
+          "Everything looks good to me. LGTM, approved! \u2705",
+          "Thanks, @Hannah Johnson and @Charlie Jones! Appreciate the quick review and feedback. I'll merge it now. \ud83d\ude4c",
+          "Yep, I can confirm that too. The integration looks seamless. LGTM, approved! \u2705"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce"
+        ],
+        "customers_referenced": [
+          "TechCorp",
+          "CloudSync"
+        ],
+        "time_range": "2026-03-14 to 2027-05-26"
+      },
+      "metrics": {
+        "cross_team_entropy": {
+          "value": 0.989,
+          "method": "Shannon entropy of product distribution, normalized to [0,1]",
+          "interpretation": "1.0 = evenly distributed across all products, 0.0 = single product"
+        },
+        "source_diversity": {
+          "value": 0.25,
+          "method": "Unique source types / 4 (slack, transcript, document, PR)",
+          "interpretation": "1.0 = present in all source types"
+        },
+        "no_reply_rate": {
+          "value": 1.0,
+          "method": "Fraction of Slack messages with 0 thread replies",
+          "interpretation": "Higher = less engagement / potential communication gap"
+        },
+        "avg_thread_depth": {
+          "value": 0.0,
+          "method": "Mean thread reply count for Slack messages in cluster"
+        },
+        "author_gini": {
+          "value": 0.388,
+          "method": "Gini coefficient of message authorship distribution",
+          "interpretation": "Higher = more concentrated (fewer authors dominating)"
+        },
+        "unique_authors": {
+          "value": 255,
+          "method": "Count of distinct user IDs in cluster"
+        },
+        "customer_density": {
+          "value": 0.002,
+          "method": "Customer name mentions per document in cluster"
+        },
+        "customers_referenced": {
+          "value": [
+            "TechCorp",
+            "CloudSync"
+          ],
+          "method": "Customer names found via relational join with customer master data"
+        },
+        "temporal_span_days": {
+          "value": 437,
+          "method": "Days between earliest and latest timestamped document"
+        },
+        "reaction_rate": {
+          "value": 0.0,
+          "method": "Fraction of messages with emoji reactions"
+        },
+        "product_count": {
+          "value": 30,
+          "method": "Distinct products represented in cluster"
+        }
+      },
+      "metric_signals": {
+        "compliance": 1.02,
+        "bottleneck": 3.16,
+        "communication": 3.47,
+        "anomaly": 2.0
+      },
+      "sample_snippets": [
+        "Thanks, @eid_4bcfb482 and Hannah! Appreciate the quick review and feedback. I'll merge it now. \ud83d\ude0a",
+        "Everything looks good to me. LGTM, approved! \u2705"
+      ],
+      "caveats": "Confidence 53% = stability (51%) x silhouette (0.055). Cluster stability tested across 10 bootstrap runs. Severity computed from metrics, not keyword matching.",
+      "recommendation": "Investigate 1,226 documents. Dominant metric signal: communication (3.5). Top phrases: approved, lgtm, lgtm approved.",
+      "computation": {
+        "cluster_id": 4,
+        "cluster_size": 1226,
+        "method": "TF-IDF + KMeans",
+        "silhouette": 0.0546,
+        "stability": {
+          "mean": 0.508,
+          "std": 0.174,
+          "min": 0.072,
+          "max": 0.612,
+          "stable": true
+        },
+        "severity_score": 1.99,
+        "top_tfidf_terms": [
+          "approved",
+          "lgtm",
+          "lgtm approved",
+          "appreciate quick",
+          "appreciate",
+          "quick"
+        ]
+      }
+    },
+    {
+      "id": "PAT-4C7636",
+      "title": "Joined / Joined Develop / Joined Planning",
+      "description": "Cluster of 891 documents across 30 products. Cross-team entropy: 0.99. Author concentration (Gini): 0.00. Customer references: 0.000/doc.",
+      "type": "communication",
+      "confidence": "HIGH",
+      "confidence_score": 0.85,
+      "severity": "medium",
+      "severity_reasoning": "Computed severity score: 1.1/5.0. Based on: customer density (0.000), cross-team entropy (0.99), author Gini (0.00), no-reply rate (100%).",
       "top_phrases": [
         "joined",
         "joined develop",
@@ -853,8 +1168,8 @@
         "planning",
         "joined invite"
       ],
-      "occurrence": "Found in 891 of 37,064 documents (2.4%)",
-      "effect": "Pattern spans 30 product teams with 891 messages, 0 transcripts, 0 docs.",
+      "occurrence": "891 of 37,064 documents (2.4%)",
+      "effect": "Spans 30 products, 1 authors, 540 days. Sources: {'slack': 891}.",
       "evidence": {
         "source_count": 891,
         "source_breakdown": {
@@ -863,7 +1178,8 @@
         "sample_messages": [
           "@eid_13fdff84 joined planning-onForceX. Also, @eid_d96fb219, @eid_2589c967, @eid_ec3b5d65 joined via invite.",
           "@eid_4df5d4b7, @eid_8658e19c, @eid_fa6ec727, @eid_13cb0e90 joined planning-onForceX.",
-          "@eid_fd8cecea, @eid_eb1756e0 joined planning-onForceX."
+          "@eid_fd8cecea, @eid_eb1756e0 joined planning-onForceX.",
+          "@eid_5346d7a5 joined planning-onForceX."
         ],
         "affected_products": [
           "ActionGenie",
@@ -898,24 +1214,90 @@
           "WorkFlowGenie"
         ],
         "affected_teams": [
-          "planning-onForceX",
-          "develop-emmamiller-ActionGenie",
-          "develop-charliegarcia-ActionGenie",
-          "develop-davidwilliams-ActionGenie",
-          "develop-georgebrown-ActionGenie"
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce"
         ],
+        "customers_referenced": [],
         "time_range": "2026-01-14 to 2027-07-08"
+      },
+      "metrics": {
+        "cross_team_entropy": {
+          "value": 0.991,
+          "method": "Shannon entropy of product distribution, normalized to [0,1]",
+          "interpretation": "1.0 = evenly distributed across all products, 0.0 = single product"
+        },
+        "source_diversity": {
+          "value": 0.25,
+          "method": "Unique source types / 4 (slack, transcript, document, PR)",
+          "interpretation": "1.0 = present in all source types"
+        },
+        "no_reply_rate": {
+          "value": 1.0,
+          "method": "Fraction of Slack messages with 0 thread replies",
+          "interpretation": "Higher = less engagement / potential communication gap"
+        },
+        "avg_thread_depth": {
+          "value": 0.0,
+          "method": "Mean thread reply count for Slack messages in cluster"
+        },
+        "author_gini": {
+          "value": 0.0,
+          "method": "Gini coefficient of message authorship distribution",
+          "interpretation": "Higher = more concentrated (fewer authors dominating)"
+        },
+        "unique_authors": {
+          "value": 1,
+          "method": "Count of distinct user IDs in cluster"
+        },
+        "customer_density": {
+          "value": 0.0,
+          "method": "Customer name mentions per document in cluster"
+        },
+        "customers_referenced": {
+          "value": [],
+          "method": "Customer names found via relational join with customer master data"
+        },
+        "temporal_span_days": {
+          "value": 540,
+          "method": "Days between earliest and latest timestamped document"
+        },
+        "reaction_rate": {
+          "value": 0.0,
+          "method": "Fraction of messages with emoji reactions"
+        },
+        "product_count": {
+          "value": 30,
+          "method": "Distinct products represented in cluster"
+        }
+      },
+      "metric_signals": {
+        "compliance": 1.0,
+        "bottleneck": 2.0,
+        "communication": 3.47,
+        "anomaly": 2.0
       },
       "sample_snippets": [
         "@eid_13fdff84 joined planning-onForceX. Also, @eid_d96fb219, @eid_2589c967, @eid_ec3b5d65 joined via",
         "@eid_4df5d4b7, @eid_8658e19c, @eid_fa6ec727, @eid_13cb0e90 joined planning-onForceX."
       ],
-      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
-      "recommendation": "Audit channel descriptions and purpose statements. Archive inactive channels. Reduce channel sprawl.",
+      "caveats": "Confidence 85% = stability (95%) x silhouette (0.188). Cluster stability tested across 10 bootstrap runs. Severity computed from metrics, not keyword matching.",
+      "recommendation": "Investigate 891 documents. Dominant metric signal: communication (3.5). Top phrases: joined, joined develop, joined planning.",
       "computation": {
-        "cluster_id": 8,
+        "cluster_id": 3,
         "cluster_size": 891,
         "method": "TF-IDF + KMeans",
+        "silhouette": 0.1882,
+        "stability": {
+          "mean": 0.95,
+          "std": 0.149,
+          "min": 0.502,
+          "max": 1.0,
+          "stable": true
+        },
+        "severity_score": 1.1,
         "top_tfidf_terms": [
           "joined",
           "joined develop",
@@ -927,32 +1309,34 @@
       }
     },
     {
-      "id": "PAT-5515FE",
-      "title": "Open Collaboration Signals",
-      "description": "590 instances of open-invitation language ('feel free to...'). Indicates collaborative culture but may mask unclear ownership \u2014 who is actually responsible?",
+      "id": "PAT-87CCCD",
+      "title": "Open Source / Source / Open",
+      "description": "Cluster of 930 documents across 30 products. Cross-team entropy: 0.99. Author concentration (Gini): 0.43. Customer references: 0.000/doc.",
       "type": "communication",
-      "confidence": "LOW",
-      "confidence_score": 0.5,
-      "severity": "low",
+      "confidence": "HIGH",
+      "confidence_score": 0.77,
+      "severity": "medium",
+      "severity_reasoning": "Computed severity score: 1.3/5.0. Based on: customer density (0.000), cross-team entropy (0.99), author Gini (0.43), no-reply rate (100%).",
       "top_phrases": [
-        "feel free",
-        "free",
-        "feel",
-        "feel free reach",
-        "free reach",
-        "reach"
+        "open source",
+        "source",
+        "open",
+        "hi team",
+        "hi",
+        "team"
       ],
-      "occurrence": "Found in 590 of 37,064 documents (1.6%)",
-      "effect": "Pattern spans 30 product teams with 590 messages, 0 transcripts, 0 docs.",
+      "occurrence": "930 of 37,064 documents (2.5%)",
+      "effect": "Spans 30 products, 279 authors, 537 days. Sources: {'slack': 930}.",
       "evidence": {
-        "source_count": 590,
+        "source_count": 930,
         "source_breakdown": {
-          "slack": 590
+          "slack": 930
         },
         "sample_messages": [
-          "Absolutely, feel free to reach out if you need a hand with anything. Looking forward to the updates! \ud83d\ude0a",
-          "Absolutely, feel free to reach out if you need anything. Thanks for tackling this important update, @eid_4cede092! \ud83d\ude4c",
-          "Yeah, feel free to reach out if you need a hand. Once the preferences are sorted, I think we'll be good to go! \ud83d\ude80"
+          "Hi team, I've shared the <https://sf-internal.slack.com/archives/docs/onforcex_market_research_report|Market Research Report> for onForceX. Let's discuss and refine it together. Looking forward to you",
+          "Hi team, I wanted to discuss the Market Research Report on X-Genie. It's pretty interesting and I think we can learn a lot from it. \ud83d\udcca",
+          "Hi team, I've shared the <https://sf-internal.slack.com/archives/docs/onforcex_product_vision_document|Product Vision Document> for onForceX. Let's discuss and refine it to ensure it aligns with our s",
+          "Hi team, I wanted to discuss the X-Genie Product Vision Document. It's quite interesting and could have some implications for us. Thoughts? \ud83e\udd14"
         ],
         "affected_products": [
           "ActionGenie",
@@ -987,31 +1371,568 @@
           "WorkFlowGenie"
         ],
         "affected_teams": [
-          "develop-ianmiller-ActionGenie",
-          "develop-emmajones-ActionGenie",
-          "bug-ianmiller-ActionGenie",
-          "bug-charliegarcia-ActionGenie",
-          "bug-emmajones-ActionGenie"
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce"
         ],
-        "time_range": "2026-02-07 to 2027-06-30"
+        "customers_referenced": [],
+        "time_range": "2026-01-18 to 2027-07-10"
+      },
+      "metrics": {
+        "cross_team_entropy": {
+          "value": 0.995,
+          "method": "Shannon entropy of product distribution, normalized to [0,1]",
+          "interpretation": "1.0 = evenly distributed across all products, 0.0 = single product"
+        },
+        "source_diversity": {
+          "value": 0.25,
+          "method": "Unique source types / 4 (slack, transcript, document, PR)",
+          "interpretation": "1.0 = present in all source types"
+        },
+        "no_reply_rate": {
+          "value": 1.0,
+          "method": "Fraction of Slack messages with 0 thread replies",
+          "interpretation": "Higher = less engagement / potential communication gap"
+        },
+        "avg_thread_depth": {
+          "value": 0.0,
+          "method": "Mean thread reply count for Slack messages in cluster"
+        },
+        "author_gini": {
+          "value": 0.434,
+          "method": "Gini coefficient of message authorship distribution",
+          "interpretation": "Higher = more concentrated (fewer authors dominating)"
+        },
+        "unique_authors": {
+          "value": 279,
+          "method": "Count of distinct user IDs in cluster"
+        },
+        "customer_density": {
+          "value": 0.0,
+          "method": "Customer name mentions per document in cluster"
+        },
+        "customers_referenced": {
+          "value": [],
+          "method": "Customer names found via relational join with customer master data"
+        },
+        "temporal_span_days": {
+          "value": 537,
+          "method": "Days between earliest and latest timestamped document"
+        },
+        "reaction_rate": {
+          "value": 0.0,
+          "method": "Fraction of messages with emoji reactions"
+        },
+        "product_count": {
+          "value": 30,
+          "method": "Distinct products represented in cluster"
+        }
+      },
+      "metric_signals": {
+        "compliance": 1.0,
+        "bottleneck": 3.3,
+        "communication": 3.48,
+        "anomaly": 2.0
       },
       "sample_snippets": [
-        "Absolutely, feel free to reach out if you need a hand with anything. Looking forward to the updates!",
-        "Absolutely, feel free to reach out if you need anything. Thanks for tackling this important update, "
+        "Hi team, I've shared the <https://sf-internal.slack.com/archives/docs/onforcex_market_research_repor",
+        "Hi team, I wanted to discuss the Market Research Report on X-Genie. It's pretty interesting and I th"
       ],
-      "caveats": "Cluster confidence: 95%. Based on TF-IDF similarity \u2014 verify semantic relevance.",
-      "recommendation": "Pair 'feel free' invitations with explicit ownership: 'Feel free to review, but Alice owns the final decision.'",
+      "caveats": "Confidence 77% = stability (89%) x silhouette (0.099). Cluster stability tested across 10 bootstrap runs. Severity computed from metrics, not keyword matching.",
+      "recommendation": "Investigate 930 documents. Dominant metric signal: communication (3.5). Top phrases: open source, source, open.",
       "computation": {
-        "cluster_id": 13,
-        "cluster_size": 590,
+        "cluster_id": 10,
+        "cluster_size": 930,
         "method": "TF-IDF + KMeans",
+        "silhouette": 0.0993,
+        "stability": {
+          "mean": 0.888,
+          "std": 0.116,
+          "min": 0.658,
+          "max": 0.999,
+          "stable": true
+        },
+        "severity_score": 1.31,
         "top_tfidf_terms": [
-          "feel free",
-          "free",
-          "feel",
-          "feel free reach",
-          "free reach",
-          "reach"
+          "open source",
+          "source",
+          "open",
+          "hi team",
+          "hi",
+          "team"
+        ]
+      }
+    },
+    {
+      "id": "PAT-CE300B",
+      "title": "Customers Reporting / Team Customers Reporting / Reporting Issues",
+      "description": "Cluster of 297 documents across 30 products. Cross-team entropy: 1.00. Author concentration (Gini): 0.27. Customer references: 0.000/doc.",
+      "type": "communication",
+      "confidence": "HIGH",
+      "confidence_score": 0.77,
+      "severity": "medium",
+      "severity_reasoning": "Computed severity score: 0.9/5.0. Based on: customer density (0.000), cross-team entropy (1.00), author Gini (0.27), no-reply rate (100%).",
+      "top_phrases": [
+        "customers reporting",
+        "team customers reporting",
+        "reporting issues",
+        "customers reporting issues",
+        "hi team customers",
+        "team customers"
+      ],
+      "occurrence": "297 of 37,064 documents (0.8%)",
+      "effect": "Spans 30 products, 46 authors, 414 days. Sources: {'slack': 297}.",
+      "evidence": {
+        "source_count": 297,
+        "source_breakdown": {
+          "slack": 297
+        },
+        "sample_messages": [
+          "Hi team, several customers are reporting issues with ActionGenie that we need to address. Let's go through them one by one. \ud83d\ude0a",
+          "Hi team, several customers are reporting issues with ActionGenie that we need to address. Let's go through them one by one. \ud83d\ude0a",
+          "Hi team, several customers are reporting issues with ActionGenie that we need to address. Let's go through them one by one. \ud83d\ude0a",
+          "Hi team, several customers are reporting issues with ActionGenie that we need to address ASAP. Let's go through them one by one. \ud83d\ude80"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce"
+        ],
+        "customers_referenced": [],
+        "time_range": "2026-05-20 to 2027-07-09"
+      },
+      "metrics": {
+        "cross_team_entropy": {
+          "value": 1.0,
+          "method": "Shannon entropy of product distribution, normalized to [0,1]",
+          "interpretation": "1.0 = evenly distributed across all products, 0.0 = single product"
+        },
+        "source_diversity": {
+          "value": 0.25,
+          "method": "Unique source types / 4 (slack, transcript, document, PR)",
+          "interpretation": "1.0 = present in all source types"
+        },
+        "no_reply_rate": {
+          "value": 1.0,
+          "method": "Fraction of Slack messages with 0 thread replies",
+          "interpretation": "Higher = less engagement / potential communication gap"
+        },
+        "avg_thread_depth": {
+          "value": 0.0,
+          "method": "Mean thread reply count for Slack messages in cluster"
+        },
+        "author_gini": {
+          "value": 0.271,
+          "method": "Gini coefficient of message authorship distribution",
+          "interpretation": "Higher = more concentrated (fewer authors dominating)"
+        },
+        "unique_authors": {
+          "value": 46,
+          "method": "Count of distinct user IDs in cluster"
+        },
+        "customer_density": {
+          "value": 0.0,
+          "method": "Customer name mentions per document in cluster"
+        },
+        "customers_referenced": {
+          "value": [],
+          "method": "Customer names found via relational join with customer master data"
+        },
+        "temporal_span_days": {
+          "value": 414,
+          "method": "Days between earliest and latest timestamped document"
+        },
+        "reaction_rate": {
+          "value": 0.0,
+          "method": "Fraction of messages with emoji reactions"
+        },
+        "product_count": {
+          "value": 30,
+          "method": "Distinct products represented in cluster"
+        }
+      },
+      "metric_signals": {
+        "compliance": 1.0,
+        "bottleneck": 2.81,
+        "communication": 3.5,
+        "anomaly": 2.0
+      },
+      "sample_snippets": [
+        "Hi team, several customers are reporting issues with ActionGenie that we need to address. Let's go t",
+        "Hi team, several customers are reporting issues with ActionGenie that we need to address. Let's go t"
+      ],
+      "caveats": "Confidence 77% = stability (64%) x silhouette (0.480). Cluster stability tested across 10 bootstrap runs. Severity computed from metrics, not keyword matching.",
+      "recommendation": "Investigate 297 documents. Dominant metric signal: communication (3.5). Top phrases: customers reporting, team customers reporting, reporting issues.",
+      "computation": {
+        "cluster_id": 9,
+        "cluster_size": 297,
+        "method": "TF-IDF + KMeans",
+        "silhouette": 0.4798,
+        "stability": {
+          "mean": 0.638,
+          "std": 0.365,
+          "min": 0.17,
+          "max": 1.0,
+          "stable": true
+        },
+        "severity_score": 0.94,
+        "top_tfidf_terms": [
+          "customers reporting",
+          "team customers reporting",
+          "reporting issues",
+          "customers reporting issues",
+          "hi team customers",
+          "team customers"
+        ]
+      }
+    },
+    {
+      "id": "PAT-52EC9E",
+      "title": "Thanks Sharing / Sharing / Thanks Sharing Ll",
+      "description": "Cluster of 802 documents across 30 products. Cross-team entropy: 0.99. Author concentration (Gini): 0.37. Customer references: 0.000/doc.",
+      "type": "communication",
+      "confidence": "MEDIUM",
+      "confidence_score": 0.66,
+      "severity": "medium",
+      "severity_reasoning": "Computed severity score: 1.3/5.0. Based on: customer density (0.000), cross-team entropy (0.99), author Gini (0.37), no-reply rate (100%).",
+      "top_phrases": [
+        "thanks sharing",
+        "sharing",
+        "thanks sharing ll",
+        "sharing ll",
+        "thanks",
+        "ll look"
+      ],
+      "occurrence": "802 of 37,064 documents (2.2%)",
+      "effect": "Spans 30 products, 227 authors, 471 days. Sources: {'slack': 802}.",
+      "evidence": {
+        "source_count": 802,
+        "source_breakdown": {
+          "slack": 802
+        },
+        "sample_messages": [
+          "Hey @eid_13cb0e90, thanks for sharing! I'll take a look at it now. \ud83d\udc40",
+          "Hey @eid_31cb6db5, thanks for sharing! I'll start reviewing it now. \ud83d\ude0a",
+          "@eid_4cede092 Thanks for sharing, I'll take a look now! \ud83d\udd0d",
+          "Hey @eid_31cb6db5, thanks for sharing! I'll start reviewing it now. Just to confirm, this covers error handling at all critical points, right?"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce"
+        ],
+        "customers_referenced": [],
+        "time_range": "2026-03-14 to 2027-06-29"
+      },
+      "metrics": {
+        "cross_team_entropy": {
+          "value": 0.992,
+          "method": "Shannon entropy of product distribution, normalized to [0,1]",
+          "interpretation": "1.0 = evenly distributed across all products, 0.0 = single product"
+        },
+        "source_diversity": {
+          "value": 0.25,
+          "method": "Unique source types / 4 (slack, transcript, document, PR)",
+          "interpretation": "1.0 = present in all source types"
+        },
+        "no_reply_rate": {
+          "value": 1.0,
+          "method": "Fraction of Slack messages with 0 thread replies",
+          "interpretation": "Higher = less engagement / potential communication gap"
+        },
+        "avg_thread_depth": {
+          "value": 0.0,
+          "method": "Mean thread reply count for Slack messages in cluster"
+        },
+        "author_gini": {
+          "value": 0.369,
+          "method": "Gini coefficient of message authorship distribution",
+          "interpretation": "Higher = more concentrated (fewer authors dominating)"
+        },
+        "unique_authors": {
+          "value": 227,
+          "method": "Count of distinct user IDs in cluster"
+        },
+        "customer_density": {
+          "value": 0.0,
+          "method": "Customer name mentions per document in cluster"
+        },
+        "customers_referenced": {
+          "value": [],
+          "method": "Customer names found via relational join with customer master data"
+        },
+        "temporal_span_days": {
+          "value": 471,
+          "method": "Days between earliest and latest timestamped document"
+        },
+        "reaction_rate": {
+          "value": 0.0,
+          "method": "Fraction of messages with emoji reactions"
+        },
+        "product_count": {
+          "value": 30,
+          "method": "Distinct products represented in cluster"
+        }
+      },
+      "metric_signals": {
+        "compliance": 1.0,
+        "bottleneck": 3.11,
+        "communication": 3.48,
+        "anomaly": 2.0
+      },
+      "sample_snippets": [
+        "Hey @eid_13cb0e90, thanks for sharing! I'll take a look at it now. \ud83d\udc40",
+        "Hey @eid_31cb6db5, thanks for sharing! I'll start reviewing it now. \ud83d\ude0a"
+      ],
+      "caveats": "Confidence 66% = stability (67%) x silhouette (0.155). Cluster stability tested across 10 bootstrap runs. Severity computed from metrics, not keyword matching.",
+      "recommendation": "Investigate 802 documents. Dominant metric signal: communication (3.5). Top phrases: thanks sharing, sharing, thanks sharing ll.",
+      "computation": {
+        "cluster_id": 5,
+        "cluster_size": 802,
+        "method": "TF-IDF + KMeans",
+        "silhouette": 0.1554,
+        "stability": {
+          "mean": 0.669,
+          "std": 0.24,
+          "min": 0.152,
+          "max": 0.986,
+          "stable": true
+        },
+        "severity_score": 1.28,
+        "top_tfidf_terms": [
+          "thanks sharing",
+          "sharing",
+          "thanks sharing ll",
+          "sharing ll",
+          "thanks",
+          "ll look"
+        ]
+      }
+    },
+    {
+      "id": "PAT-4891FD",
+      "title": "Team Check Pr / Team Check / Hi Team Check",
+      "description": "Cluster of 686 documents across 30 products. Cross-team entropy: 0.99. Author concentration (Gini): 0.39. Customer references: 0.000/doc.",
+      "type": "communication",
+      "confidence": "MEDIUM",
+      "confidence_score": 0.6,
+      "severity": "medium",
+      "severity_reasoning": "Computed severity score: 1.3/5.0. Based on: customer density (0.000), cross-team entropy (0.99), author Gini (0.39), no-reply rate (100%).",
+      "top_phrases": [
+        "team check pr",
+        "team check",
+        "hi team check",
+        "check pr",
+        "check pr pull",
+        "know thoughts"
+      ],
+      "occurrence": "686 of 37,064 documents (1.9%)",
+      "effect": "Spans 30 products, 208 authors, 400 days. Sources: {'slack': 686}.",
+      "evidence": {
+        "source_count": 686,
+        "source_breakdown": {
+          "slack": 686
+        },
+        "sample_messages": [
+          "Hi team, please check my PR for integrating the Slack Events API: https://github.com/salesforce/onForceX/pull/1. This will allow onForceX to interact with third-party Slack apps by setting up the nece",
+          "Hi team, please check my PR for the new data ingestion pipeline: https://github.com/salesforce/onForceX/pull/3. \ud83d\ude80 This PR introduces a pipeline to efficiently process incoming data for AI model update",
+          "Hi team, please check my PR for defining data schemas for third-party app interactions: https://github.com/salesforce/onForceX/pull/4. I've created clear and concise data schemas to ensure consistent ",
+          "Hi team, please check my PR for the new error handling and alerting mechanism: https://github.com/salesforce/onForceX/pull/6. This update ensures robust error handling and alerting in our data process"
+        ],
+        "affected_products": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce",
+          "CollaborationForce",
+          "ConnectForce",
+          "ContentForce",
+          "ContextForce",
+          "EdgeForce",
+          "ExplainabilityForce",
+          "FeedbackForce",
+          "FlowForce",
+          "ForecastForce",
+          "InsightForce",
+          "KnowledgeForce",
+          "LeadForce",
+          "MonitorForce",
+          "PersonalizeForce",
+          "PitchForce",
+          "ProposalForce",
+          "SearchFlow",
+          "SearchForce",
+          "SecurityForce",
+          "SentimentForce",
+          "SummarizeForce",
+          "SupportForce",
+          "TrendForce",
+          "VizForce",
+          "WorkFlowGenie"
+        ],
+        "affected_teams": [
+          "ActionGenie",
+          "AnomalyForce",
+          "AutoTuneForce",
+          "CoachForce",
+          "CollaborateForce"
+        ],
+        "customers_referenced": [],
+        "time_range": "2026-03-14 to 2027-04-19"
+      },
+      "metrics": {
+        "cross_team_entropy": {
+          "value": 0.99,
+          "method": "Shannon entropy of product distribution, normalized to [0,1]",
+          "interpretation": "1.0 = evenly distributed across all products, 0.0 = single product"
+        },
+        "source_diversity": {
+          "value": 0.25,
+          "method": "Unique source types / 4 (slack, transcript, document, PR)",
+          "interpretation": "1.0 = present in all source types"
+        },
+        "no_reply_rate": {
+          "value": 1.0,
+          "method": "Fraction of Slack messages with 0 thread replies",
+          "interpretation": "Higher = less engagement / potential communication gap"
+        },
+        "avg_thread_depth": {
+          "value": 0.0,
+          "method": "Mean thread reply count for Slack messages in cluster"
+        },
+        "author_gini": {
+          "value": 0.388,
+          "method": "Gini coefficient of message authorship distribution",
+          "interpretation": "Higher = more concentrated (fewer authors dominating)"
+        },
+        "unique_authors": {
+          "value": 208,
+          "method": "Count of distinct user IDs in cluster"
+        },
+        "customer_density": {
+          "value": 0.0,
+          "method": "Customer name mentions per document in cluster"
+        },
+        "customers_referenced": {
+          "value": [],
+          "method": "Customer names found via relational join with customer master data"
+        },
+        "temporal_span_days": {
+          "value": 400,
+          "method": "Days between earliest and latest timestamped document"
+        },
+        "reaction_rate": {
+          "value": 0.0,
+          "method": "Fraction of messages with emoji reactions"
+        },
+        "product_count": {
+          "value": 30,
+          "method": "Distinct products represented in cluster"
+        }
+      },
+      "metric_signals": {
+        "compliance": 1.0,
+        "bottleneck": 3.16,
+        "communication": 3.47,
+        "anomaly": 2.0
+      },
+      "sample_snippets": [
+        "Hi team, please check my PR for integrating the Slack Events API: https://github.com/salesforce/onFo",
+        "Hi team, please check my PR for the new data ingestion pipeline: https://github.com/salesforce/onFor"
+      ],
+      "caveats": "Confidence 60% = stability (59%) x silhouette (0.132). Cluster stability tested across 10 bootstrap runs. Severity computed from metrics, not keyword matching.",
+      "recommendation": "Investigate 686 documents. Dominant metric signal: communication (3.5). Top phrases: team check pr, team check, hi team check.",
+      "computation": {
+        "cluster_id": 1,
+        "cluster_size": 686,
+        "method": "TF-IDF + KMeans",
+        "silhouette": 0.1317,
+        "stability": {
+          "mean": 0.587,
+          "std": 0.32,
+          "min": 0.131,
+          "max": 1.0,
+          "stable": true
+        },
+        "severity_score": 1.29,
+        "top_tfidf_terms": [
+          "team check pr",
+          "team check",
+          "hi team check",
+          "check pr",
+          "check pr pull",
+          "know thoughts"
         ]
       }
     }
