@@ -304,8 +304,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       </div>
     </div>
     <div class="header-tabs">
-      <button class="tab-btn active" id="tab-btn-crm" onclick="switchTab('crm')">CRM Pipeline Forensics</button>
-      <button class="tab-btn" id="tab-btn-nlp" onclick="switchTab('nlp')">Communication Pattern Analysis</button>
+      <button class="tab-btn active" id="tab-btn-crm" onclick="switchTab('crm')">CRM Pipeline</button>
+      <button class="tab-btn" id="tab-btn-bpi" onclick="switchTab('bpi')">BPI Challenge 2019</button>
+      <button class="tab-btn" id="tab-btn-ides" onclick="switchTab('ides')">SAP IDES Compliance</button>
+      <button class="tab-btn" id="tab-btn-nlp" onclick="switchTab('nlp')">NLP Patterns</button>
     </div>
     <div class="header-meta">
       <!-- CRM stats (shown when CRM tab active) -->
@@ -313,6 +315,18 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
         <div class="header-stat"><div class="header-stat-value">8,800</div><div class="header-stat-label">Opportunities</div></div>
         <div class="header-stat"><div class="header-stat-value">85</div><div class="header-stat-label">Accounts</div></div>
         <div class="header-stat"><div class="header-stat-value">$10M</div><div class="header-stat-label">Revenue</div></div>
+      </div>
+      <!-- BPI stats -->
+      <div id="meta-bpi" style="display:none;gap:24px;align-items:center;">
+        <div class="header-stat"><div class="header-stat-value">251,734</div><div class="header-stat-label">Purchase Orders</div></div>
+        <div class="header-stat"><div class="header-stat-value">1.6M</div><div class="header-stat-label">Events</div></div>
+        <div class="header-stat"><div class="header-stat-value">42</div><div class="header-stat-label">Activities</div></div>
+      </div>
+      <!-- IDES stats -->
+      <div id="meta-ides" style="display:none;gap:24px;align-items:center;">
+        <div class="header-stat"><div class="header-stat-value">3,132</div><div class="header-stat-label">Cases</div></div>
+        <div class="header-stat"><div class="header-stat-value" style="color:#FF6B6B">7</div><div class="header-stat-label">Violations Found</div></div>
+        <div class="header-stat"><div class="header-stat-value">300</div><div class="header-stat-label">Process Variants</div></div>
       </div>
       <!-- NLP stats (shown when NLP tab active) -->
       <div id="meta-nlp" style="display:none;gap:24px;align-items:center;">
@@ -979,15 +993,417 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 
 </div><!-- /tab-nlp -->
 
+<!-- ═══════════════════════════════════════════════
+     TAB 3: BPI Challenge 2019 — Purchase-to-Pay
+═══════════════════════════════════════════════ -->
+<div id="tab-bpi" class="tab-panel">
+<div class="page">
+
+  <!-- Source Banner -->
+  <div style="margin-bottom:24px;padding:14px 20px;background:#FFF9E6;border:1px solid #E8D48B;border-radius:6px;font-size:12px;color:#7A6C1E;line-height:1.6">
+    <strong>Data Source:</strong> BPI Challenge 2019 — 4TU.ResearchData (CC BY 4.0). Real purchase-to-pay event log from a multinational coatings and paints company. 251,734 purchase order items, 1,595,923 events, 628 unique resources. Period: Jan 2018 — Jan 2019.
+  </div>
+
+  <!-- SECTION: Key Metrics -->
+  <div class="section">
+    <div class="section-title">Process Overview</div>
+    <div class="stat-grid">
+      <div class="stat-card accent-blue">
+        <div class="stat-card-value">64.3</div>
+        <div class="stat-card-label">Median Throughput (days)</div>
+        <div class="stat-card-sub">Average 72.3 days; max 25,670 days (stale POs)</div>
+      </div>
+      <div class="stat-card accent-green">
+        <div class="stat-card-value">32%</div>
+        <div class="stat-card-label">Top 2 Variants Coverage</div>
+        <div class="stat-card-sub">Only 2 of hundreds of paths cover a third of cases</div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid var(--high)">
+        <div class="stat-card-value">57,136</div>
+        <div class="stat-card-label">Payment Blocks</div>
+        <div class="stat-card-sub">22.7% of all POs required manual block removal</div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid var(--critical)">
+        <div class="stat-card-value">2,835</div>
+        <div class="stat-card-label">Incomplete Cases</div>
+        <div class="stat-card-sub">POs that never progressed past creation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Process Variants -->
+  <div class="section">
+    <div class="section-title">Most Common Process Paths</div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead><tr style="background:#F8F8F8;border-bottom:2px solid var(--border)">
+          <th style="padding:12px 16px;text-align:left;font-weight:700;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">#</th>
+          <th style="padding:12px 16px;text-align:left;font-weight:700;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">Process Path</th>
+          <th style="padding:12px 16px;text-align:right;font-weight:700;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">Cases</th>
+          <th style="padding:12px 16px;text-align:right;font-weight:700;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.5px">%</th>
+        </tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:10px 16px;font-family:var(--mono);color:var(--sf-blue);font-weight:700">1</td>
+            <td style="padding:10px 16px"><span style="font-family:var(--mono);font-size:11px">Create PO → Vendor Invoice → Goods Receipt → Invoice Receipt → Clear Invoice</span></td>
+            <td style="padding:10px 16px;text-align:right;font-family:var(--mono);font-weight:600">50,286</td>
+            <td style="padding:10px 16px;text-align:right;font-family:var(--mono)">20.0%</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:10px 16px;font-family:var(--mono);color:var(--sf-blue);font-weight:700">2</td>
+            <td style="padding:10px 16px"><span style="font-family:var(--mono);font-size:11px">Create PO → Goods Receipt → Vendor Invoice → Invoice Receipt → Clear Invoice</span></td>
+            <td style="padding:10px 16px;text-align:right;font-family:var(--mono);font-weight:600">30,798</td>
+            <td style="padding:10px 16px;text-align:right;font-family:var(--mono)">12.2%</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:10px 16px;font-family:var(--mono);color:var(--high);font-weight:700">3</td>
+            <td style="padding:10px 16px"><span style="font-family:var(--mono);font-size:11px">Create PO → Goods Receipt</span> <span style="font-size:10px;color:var(--high);font-weight:600">(incomplete)</span></td>
+            <td style="padding:10px 16px;text-align:right;font-family:var(--mono);font-weight:600">9,443</td>
+            <td style="padding:10px 16px;text-align:right;font-family:var(--mono)">3.8%</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border-light)">
+            <td style="padding:10px 16px;font-family:var(--mono);color:var(--sf-blue);font-weight:700">4</td>
+            <td style="padding:10px 16px"><span style="font-family:var(--mono);font-size:11px">Create PO → Vendor Invoice → GR → IR → Remove Payment Block → Clear</span></td>
+            <td style="padding:10px 16px;text-align:right;font-family:var(--mono);font-weight:600">6,931</td>
+            <td style="padding:10px 16px;text-align:right;font-family:var(--mono)">2.8%</td>
+          </tr>
+          <tr>
+            <td style="padding:10px 16px;font-family:var(--mono);color:var(--critical);font-weight:700">5</td>
+            <td style="padding:10px 16px"><span style="font-family:var(--mono);font-size:11px">Create PO</span> <span style="font-size:10px;color:var(--critical);font-weight:600">(abandoned — never progressed)</span></td>
+            <td style="padding:10px 16px;text-align:right;font-family:var(--mono);font-weight:600">2,835</td>
+            <td style="padding:10px 16px;text-align:right;font-family:var(--mono)">1.1%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text-muted)">
+      Key finding: Variants 1 and 2 differ only in whether the vendor invoice arrives before or after goods receipt — a classic "3-way match" ordering question in P2P. Variant 4 shows 2.8% of cases require payment block removal, indicating invoice discrepancies.
+    </div>
+  </div>
+
+  <!-- SECTION: Anomalies & Issues -->
+  <div class="section">
+    <div class="section-title">Anomalies Detected</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--critical)">Process Issues</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--critical-bg);border-radius:4px;font-size:12px">
+            <span>Payment blocks requiring intervention</span><span style="font-family:var(--mono);font-weight:700;color:var(--critical)">57,136</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--high-bg);border-radius:4px;font-size:12px">
+            <span>Quantity changes after PO creation</span><span style="font-family:var(--mono);font-weight:700;color:var(--high)">21,449</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--high-bg);border-radius:4px;font-size:12px">
+            <span>Price changes after PO creation</span><span style="font-family:var(--mono);font-weight:700;color:var(--high)">12,423</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--medium-bg);border-radius:4px;font-size:12px">
+            <span>Deleted / cancelled orders</span><span style="font-family:var(--mono);font-weight:700;color:var(--medium)">5,298</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--medium-bg);border-radius:4px;font-size:12px">
+            <span>Abandoned POs (single event)</span><span style="font-family:var(--mono);font-weight:700;color:var(--medium)">2,835</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--sf-blue)">Resource Concentration</div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">Top 10 resources handle 63% of all 1.6M events, creating operational risk if key personnel are unavailable.</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+            <span style="font-family:var(--mono);width:80px;font-weight:600">System</span>
+            <div style="flex:1;height:16px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:25%;height:100%;background:var(--sf-blue);border-radius:3px"></div></div>
+            <span style="font-family:var(--mono);width:48px;text-align:right">25.0%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+            <span style="font-family:var(--mono);width:80px;font-weight:600">user_002</span>
+            <div style="flex:1;height:16px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:10.4%;height:100%;background:var(--high);border-radius:3px"></div></div>
+            <span style="font-family:var(--mono);width:48px;text-align:right">10.4%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+            <span style="font-family:var(--mono);width:80px;font-weight:600">user_001</span>
+            <div style="flex:1;height:16px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:6%;height:100%;background:#9050E9;border-radius:3px"></div></div>
+            <span style="font-family:var(--mono);width:48px;text-align:right">6.0%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+            <span style="font-family:var(--mono);width:80px;font-weight:600">batch_001</span>
+            <div style="flex:1;height:16px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:4.6%;height:100%;background:var(--low);border-radius:3px"></div></div>
+            <span style="font-family:var(--mono);width:48px;text-align:right">4.6%</span>
+          </div>
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:var(--text-muted)">user_002 alone handles 166,353 events (10.4%). Single-person bottleneck risk.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Document Types -->
+  <div class="section">
+    <div class="section-title">Document & Matching Types</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">Purchase Order Types</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span>Standard PO</span><span style="font-family:var(--mono);font-weight:600">152,562 (60.6%)</span></div>
+          <div style="height:6px;background:var(--bg);border-radius:3px"><div style="width:60.6%;height:100%;background:var(--sf-blue);border-radius:3px"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span>Framework Order</span><span style="font-family:var(--mono);font-weight:600">62,543 (24.9%)</span></div>
+          <div style="height:6px;background:var(--bg);border-radius:3px"><div style="width:24.9%;height:100%;background:#9050E9;border-radius:3px"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span>Consignment</span><span style="font-family:var(--mono);font-weight:600">36,629 (14.6%)</span></div>
+          <div style="height:6px;background:var(--bg);border-radius:3px"><div style="width:14.6%;height:100%;background:var(--low);border-radius:3px"></div></div>
+        </div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+        <div style="font-size:13px;font-weight:700;margin-bottom:12px">Invoice Matching Strategy</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span>3-way match, invoice after GR</span><span style="font-family:var(--mono);font-weight:600">164,874 (65.5%)</span></div>
+          <div style="height:6px;background:var(--bg);border-radius:3px"><div style="width:65.5%;height:100%;background:var(--sf-blue);border-radius:3px"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span>3-way match, invoice before GR</span><span style="font-family:var(--mono);font-weight:600">67,583 (26.9%)</span></div>
+          <div style="height:6px;background:var(--bg);border-radius:3px"><div style="width:26.9%;height:100%;background:var(--high);border-radius:3px"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span>2-way match</span><span style="font-family:var(--mono);font-weight:600">19,277 (7.7%)</span></div>
+          <div style="height:6px;background:var(--bg);border-radius:3px"><div style="width:7.7%;height:100%;background:var(--medium);border-radius:3px"></div></div>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text-muted)">3-way matching compares PO, goods receipt, and invoice. The 26.9% "invoice before GR" cases are where vendors bill before physical delivery — common but higher fraud risk.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Analysis Insight -->
+  <div class="section">
+    <div class="section-title">Forensic Insight</div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm)">
+      <div style="font-size:14px;line-height:1.7;color:var(--text-secondary)">
+        <p style="margin-bottom:12px">This dataset comes from a <strong>real multinational company</strong> (anonymized for BPI Challenge 2019). The process mining community uses it as a benchmark for purchase-to-pay analysis. Our forensic engine processed the full 1.6M event log and surfaced several structural concerns:</p>
+        <p style="margin-bottom:12px"><strong>Payment blocks (22.7%)</strong> — Nearly 1 in 4 purchase orders hit a payment block requiring human intervention. This signals systematic issues in invoice matching or vendor master data quality. In a healthy P2P process, payment block rates should be under 5%.</p>
+        <p style="margin-bottom:12px"><strong>Process variability</strong> — With the top 2 variants covering only 32% of cases, the remaining 68% follow hundreds of different paths. This "spaghetti process" pattern makes it difficult to automate, audit, or optimize. Industry benchmarks target 80%+ coverage in the top 5 variants.</p>
+        <p><strong>Resource concentration</strong> — user_002 processes 10.4% of all events. If this person is unavailable (vacation, resignation), the bottleneck could cascade across the entire P2P process. This is a classic single-point-of-failure that process mining can identify but traditional audits miss.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div>Christopher Bailey · Stanford TECH 41 · Data: BPI Challenge 2019 (4TU.ResearchData, CC BY 4.0)</div>
+  <div><a href="https://github.com/chrbailey/SAP-Transaction-Forensics" target="_blank">github.com/chrbailey/SAP-Transaction-Forensics</a> · March 2026</div>
+</footer>
+
+</div><!-- /tab-bpi -->
+
+<!-- ═══════════════════════════════════════════════
+     TAB 4: SAP IDES — Compliance Violations
+═══════════════════════════════════════════════ -->
+<div id="tab-ides" class="tab-panel">
+<div class="page">
+
+  <!-- Source Banner -->
+  <div style="margin-bottom:24px;padding:14px 20px;background:var(--critical-bg);border:1px solid #E8A8A5;border-radius:6px;font-size:12px;color:#8B1A15;line-height:1.6">
+    <strong>Compliance Alert:</strong> 7 process violations detected in SAP's own IDES demo system. IDES (Internet Demonstration and Evaluation System) is SAP's official reference environment used for training and certification. These violations exist in SAP's reference data — our engine found them through automated conformance checking.
+  </div>
+
+  <!-- SECTION: Violation Summary -->
+  <div class="section">
+    <div class="section-title">Violations Detected</div>
+    <div class="stat-grid">
+      <div class="stat-card" style="border-left:4px solid var(--critical)">
+        <div class="stat-card-value" style="color:var(--critical)">7</div>
+        <div class="stat-card-label">Total Violations</div>
+        <div class="stat-card-sub">In SAP's own reference data</div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid var(--high)">
+        <div class="stat-card-value">6</div>
+        <div class="stat-card-label">Missing Purchase Requisition</div>
+        <div class="stat-card-sub">PO created without prior approval workflow</div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid var(--critical)">
+        <div class="stat-card-value">1</div>
+        <div class="stat-card-label">Retroactive Documentation</div>
+        <div class="stat-card-sub">PO created before PR — approval was backdated</div>
+      </div>
+      <div class="stat-card" style="border-left:4px solid var(--medium)">
+        <div class="stat-card-value">1</div>
+        <div class="stat-card-label">Segregation of Duties Risk</div>
+        <div class="stat-card-sub">Same resource created both PR and PO</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Violation Details -->
+  <div class="section">
+    <div class="section-title">Violation Breakdown</div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+
+      <!-- MISSING_PR -->
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)">
+        <div style="padding:16px 20px;background:var(--high-bg);border-bottom:1px solid #E8C4A0;display:flex;align-items:center;gap:12px">
+          <span style="font-family:var(--mono);font-size:11px;padding:3px 8px;background:var(--high);color:white;border-radius:4px;font-weight:700">HIGH</span>
+          <span style="font-size:14px;font-weight:700">MISSING_PR — Purchase Order Without Purchase Requisition</span>
+          <span style="margin-left:auto;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--high)">6 cases</span>
+        </div>
+        <div style="padding:20px">
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+            Six purchase orders were created directly without an associated Purchase Requisition. In a compliant Procure-to-Pay process, every PO must originate from an approved PR to ensure proper authorization and budget control.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <div style="padding:12px;background:var(--bg);border-radius:6px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Root Cause</div>
+              <div style="font-size:12px;color:var(--text-secondary)">Maverick buying — users bypassing requisition approval workflow to create POs directly</div>
+            </div>
+            <div style="padding:12px;background:var(--bg);border-radius:6px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Business Risk</div>
+              <div style="font-size:12px;color:var(--text-secondary)">Unauthorized spending, budget overruns, audit findings. Bypasses approval controls designed to prevent fraud.</div>
+            </div>
+            <div style="padding:12px;background:var(--bg);border-radius:6px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Remediation</div>
+              <div style="font-size:12px;color:var(--text-secondary)">Enforce system control: block PO creation without linked PR. Add validation rule in SAP transaction ME21N.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PO_BEFORE_PR -->
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)">
+        <div style="padding:16px 20px;background:var(--critical-bg);border-bottom:1px solid #E8A8A5;display:flex;align-items:center;gap:12px">
+          <span style="font-family:var(--mono);font-size:11px;padding:3px 8px;background:var(--critical);color:white;border-radius:4px;font-weight:700">CRITICAL</span>
+          <span style="font-size:14px;font-weight:700">PO_BEFORE_PR — Retroactive Approval Documentation</span>
+          <span style="margin-left:auto;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--critical)">1 case</span>
+        </div>
+        <div style="padding:20px">
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+            One Purchase Order was created <strong>before</strong> its associated Purchase Requisition. This means the order was placed first and the approval was documented after the fact — a clear compliance violation where the authorization workflow was bypassed and retroactively papered over.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <div style="padding:12px;background:var(--bg);border-radius:6px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Root Cause</div>
+              <div style="font-size:12px;color:var(--text-secondary)">Approval workflow bypassed — order placed first, requisition created afterward to satisfy documentation requirements</div>
+            </div>
+            <div style="padding:12px;background:var(--bg);border-radius:6px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Business Risk</div>
+              <div style="font-size:12px;color:var(--text-secondary)">Fraudulent documentation, Sarbanes-Oxley violations, audit failure. Represents intentional control circumvention.</div>
+            </div>
+            <div style="padding:12px;background:var(--bg);border-radius:6px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Remediation</div>
+              <div style="font-size:12px;color:var(--text-secondary)">Implement sequential control: system must enforce PR approval timestamp < PO creation timestamp. Add automated alert.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segregation of Duties -->
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)">
+        <div style="padding:16px 20px;background:var(--medium-bg);border-bottom:1px solid #E8D48B;display:flex;align-items:center;gap:12px">
+          <span style="font-family:var(--mono);font-size:11px;padding:3px 8px;background:var(--medium);color:white;border-radius:4px;font-weight:700">MEDIUM</span>
+          <span style="font-size:14px;font-weight:700">SOD_VIOLATION — Segregation of Duties Risk</span>
+          <span style="margin-left:auto;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--medium)">1 case</span>
+        </div>
+        <div style="padding:20px">
+          <div style="font-size:13px;color:var(--text-secondary);line-height:1.7;margin-bottom:16px">
+            One case where the same resource created both the Purchase Requisition (request) and the Purchase Order (fulfillment). Proper segregation of duties requires different individuals to request and approve purchases to prevent self-dealing.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+            <div style="padding:12px;background:var(--bg);border-radius:6px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Root Cause</div>
+              <div style="font-size:12px;color:var(--text-secondary)">Missing role separation — user has authorization for both ME51N (create PR) and ME21N (create PO)</div>
+            </div>
+            <div style="padding:12px;background:var(--bg);border-radius:6px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Business Risk</div>
+              <div style="font-size:12px;color:var(--text-secondary)">Self-dealing, fictitious vendor schemes. One person can request, approve, and fulfill without oversight.</div>
+            </div>
+            <div style="padding:12px;background:var(--bg);border-radius:6px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Remediation</div>
+              <div style="font-size:12px;color:var(--text-secondary)">Review SAP role assignments (PFCG). Ensure PR creator and PO creator roles are mutually exclusive.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION: O2C + P2P Comparison -->
+  <div class="section">
+    <div class="section-title">IDES Process Comparison — O2C vs P2P</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px;color:var(--sf-blue)">Order-to-Cash (O2C)</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:16px">Sales side — from customer order to payment</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <div style="display:flex;justify-content:space-between"><span>Cases analyzed</span><span style="font-family:var(--mono);font-weight:600">646</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Total events</span><span style="font-family:var(--mono);font-weight:600">5,708</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Unique activities</span><span style="font-family:var(--mono);font-weight:600">8</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Process variants</span><span style="font-family:var(--mono);font-weight:600;color:var(--high)">158</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Median duration</span><span style="font-family:var(--mono);font-weight:600">2.7 days</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Max duration</span><span style="font-family:var(--mono);font-weight:600;color:var(--critical)">6,578 days</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Normal completion rate</span><span style="font-family:var(--mono);font-weight:600;color:var(--low)">83.6%</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Invoice cancellation delay</span><span style="font-family:var(--mono);font-weight:600;color:var(--high)">17.7 days avg</span></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 12px;background:var(--bg);border-radius:6px;font-size:11px;color:var(--text-secondary)">
+          <strong>Key finding:</strong> 158 unique process variants for just 8 activities and 646 cases — extreme variability. The max duration of 6,578 days (18 years) indicates stale/orphaned orders in the demo system that were never closed.
+        </div>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+        <div style="font-size:14px;font-weight:700;margin-bottom:4px;color:#9050E9">Procure-to-Pay (P2P)</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:16px">Purchasing side — from requisition to vendor payment</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
+          <div style="display:flex;justify-content:space-between"><span>Cases analyzed</span><span style="font-family:var(--mono);font-weight:600">2,486</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Total events</span><span style="font-family:var(--mono);font-weight:600">7,420</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Unique activities</span><span style="font-family:var(--mono);font-weight:600">20</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Process variants</span><span style="font-family:var(--mono);font-weight:600;color:var(--high)">142</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Average duration</span><span style="font-family:var(--mono);font-weight:600">45.2 days</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Max duration</span><span style="font-family:var(--mono);font-weight:600;color:var(--high)">1,027 days</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Compliance violations</span><span style="font-family:var(--mono);font-weight:600;color:var(--critical)">7</span></div>
+          <div style="display:flex;justify-content:space-between"><span>Batch processing outlier</span><span style="font-family:var(--mono);font-weight:600;color:var(--high)">2,181 events</span></div>
+        </div>
+        <div style="margin-top:12px;padding:10px 12px;background:var(--bg);border-radius:6px;font-size:11px;color:var(--text-secondary)">
+          <strong>Key finding:</strong> 7 compliance violations in SAP's own demo data. The "PO before PR" case is particularly notable — it represents retroactive documentation, a pattern that in production systems is a red flag for fraud investigators.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION: Why This Matters -->
+  <div class="section">
+    <div class="section-title">Why This Matters</div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm)">
+      <div style="font-size:14px;line-height:1.7;color:var(--text-secondary)">
+        <p style="margin-bottom:12px"><strong>SAP IDES is not production data</strong> — it's SAP's official demo and training environment. Thousands of consultants learn SAP using this system. Yet our automated conformance checker found 7 compliance violations that exist in the reference data itself.</p>
+        <p style="margin-bottom:12px">This demonstrates two things: <strong>(1)</strong> Automated process mining catches what manual review misses, even in well-known systems. <strong>(2)</strong> If reference data contains these patterns, production systems — with real users under real deadline pressure — almost certainly contain more.</p>
+        <p style="margin-bottom:12px">The conformance checking engine uses <strong>token-based replay</strong> (van der Aalst algorithm) to compare actual event sequences against expected process models. For P2P, the expected model requires: PR → PO → Goods Receipt → Invoice → Payment. Any deviation is flagged, measured, and classified by severity.</p>
+        <p>The O2C analysis reveals a different problem: <strong>158 process variants from just 8 activities</strong>. This is a "spaghetti process" — technically functional but impossible to audit or optimize at scale. Combined with the 6,578-day max duration (stale orders from the 1990s still open), it paints a picture of a system that works but accumulates technical debt in its process layer.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tech Stack -->
+  <div class="section">
+    <div class="section-title">Analysis Methodology</div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+      <div style="font-size:12px;font-family:var(--mono);color:var(--text-secondary);line-height:2">
+        Conformance Engine: Token-based replay, ProcessModelBuilder, van der Aalst algorithms<br>
+        Data Adapters: BPI (XES/OCEL), SAP IDES (sap-extractor, MIT), Synthetic (seed=42)<br>
+        Pattern Engine: Python 3.11, scikit-learn, scipy (TF-IDF + K-Means + effect sizing)<br>
+        Temporal Analysis: Throughput time, bottleneck detection, delay probability<br>
+        Tests: 834 passing (602 TypeScript + 232 Python)<br>
+        Source: <a href="https://github.com/chrbailey/SAP-Transaction-Forensics" style="color:var(--sf-blue)">github.com/chrbailey/SAP-Transaction-Forensics</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div>Christopher Bailey · Stanford TECH 41 · Data: SAP IDES Demo System (MIT via sap-extractor) + BPI Challenge 2019 (CC BY 4.0)</div>
+  <div><a href="https://github.com/chrbailey/SAP-Transaction-Forensics" target="_blank">github.com/chrbailey/SAP-Transaction-Forensics</a> · March 2026</div>
+</footer>
+
+</div><!-- /tab-ides -->
+
 <script>
 // ─── Tab switching ───
+var TABS = ['crm', 'bpi', 'ides', 'nlp'];
 function switchTab(tab) {
-  document.getElementById('tab-crm').classList.toggle('active', tab === 'crm');
-  document.getElementById('tab-nlp').classList.toggle('active', tab === 'nlp');
-  document.getElementById('tab-btn-crm').classList.toggle('active', tab === 'crm');
-  document.getElementById('tab-btn-nlp').classList.toggle('active', tab === 'nlp');
-  document.getElementById('meta-crm').style.display = tab === 'crm' ? 'flex' : 'none';
-  document.getElementById('meta-nlp').style.display = tab === 'nlp' ? 'flex' : 'none';
+  TABS.forEach(function(t) {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('tab-btn-' + t).classList.toggle('active', t === tab);
+    document.getElementById('meta-' + t).style.display = t === tab ? 'flex' : 'none';
+  });
   window.scrollTo(0, 0);
 }
 
