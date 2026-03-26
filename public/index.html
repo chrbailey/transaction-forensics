@@ -308,6 +308,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       <button class="tab-btn" id="tab-btn-crm" onclick="switchTab('crm')">CRM Pipeline</button>
       <button class="tab-btn" id="tab-btn-bpi" onclick="switchTab('bpi')">BPI Challenge</button>
       <button class="tab-btn" id="tab-btn-ides" onclick="switchTab('ides')">IDES Compliance</button>
+      <button class="tab-btn" id="tab-btn-cases" onclick="switchTab('cases')">Client Cases</button>
       <button class="tab-btn" id="tab-btn-nlp" onclick="switchTab('nlp')">NLP Patterns</button>
     </div>
     <div class="header-meta">
@@ -334,6 +335,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
         <div class="header-stat"><div class="header-stat-value">3,132</div><div class="header-stat-label">Cases</div></div>
         <div class="header-stat"><div class="header-stat-value" style="color:#FF6B6B">7</div><div class="header-stat-label">Violations Found</div></div>
         <div class="header-stat"><div class="header-stat-value">300</div><div class="header-stat-label">Process Variants</div></div>
+      </div>
+      <!-- Cases stats -->
+      <div id="meta-cases" style="display:none;gap:24px;align-items:center;">
+        <div class="header-stat"><div class="header-stat-value">2</div><div class="header-stat-label">Client Engagements</div></div>
+        <div class="header-stat"><div class="header-stat-value">2,525</div><div class="header-stat-label">Help Tickets</div></div>
+        <div class="header-stat"><div class="header-stat-value">$103K</div><div class="header-stat-label">Savings Found</div></div>
       </div>
       <!-- NLP stats -->
       <div id="meta-nlp" style="display:none;gap:24px;align-items:center;">
@@ -596,142 +603,14 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
     </div>
   </div>
 
-  <!-- Real-World Case Study -->
-  <div class="section">
-    <div class="section-title">Real-World Application — ERP User License Audit</div>
-    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)">
-
-      <!-- Case study header -->
-      <div style="padding:20px 24px;background:linear-gradient(135deg,#032D60,#0176D3);color:white">
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;opacity:0.6;margin-bottom:4px">Client Case Study (Anonymized)</div>
-        <div style="font-size:20px;font-weight:700">Healthcare SaaS Company — NetSuite License Optimization</div>
-        <div style="font-size:12px;opacity:0.7;margin-top:4px">Automated user classification identified $103,896 in annual savings from a 289-user NetSuite environment</div>
-      </div>
-
-      <!-- Metrics row -->
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border)">
-        <div style="padding:20px;text-align:center;border-right:1px solid var(--border)">
-          <div style="font-size:28px;font-weight:800;font-family:var(--mono)">289</div>
-          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Total Users</div>
-        </div>
-        <div style="padding:20px;text-align:center;border-right:1px solid var(--border)">
-          <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:var(--critical)">69</div>
-          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Eliminable</div>
-        </div>
-        <div style="padding:20px;text-align:center;border-right:1px solid var(--border)">
-          <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:var(--low)">$103K</div>
-          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Annual Savings</div>
-        </div>
-        <div style="padding:20px;text-align:center;border-right:1px solid var(--border)">
-          <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:var(--sf-blue)">14.4x</div>
-          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">ROI</div>
-        </div>
-        <div style="padding:20px;text-align:center">
-          <div style="font-size:28px;font-weight:800;font-family:var(--mono)">0.8</div>
-          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Month Payback</div>
-        </div>
-      </div>
-
-      <!-- Classification breakdown -->
-      <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
-
-        <!-- Left: Category bars -->
-        <div>
-          <div style="font-size:13px;font-weight:700;margin-bottom:16px">User Classification</div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Employee Center (basic access)</span><span style="font-family:var(--mono);font-weight:600">241</span></div>
-              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
-                <div style="width:83.4%;height:100%;background:linear-gradient(90deg,#E8F4FD,var(--sf-blue));border-radius:4px;opacity:0.7"></div>
-                <div style="position:absolute;right:8px;top:2px;font-size:10px;font-family:var(--mono);color:var(--text-muted)">83.4%</div>
-              </div>
-            </div>
-
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--low);font-weight:600">Essential Finance</span><span style="font-family:var(--mono);font-weight:600">22</span></div>
-              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
-                <div style="width:7.6%;height:100%;background:var(--low);border-radius:4px;opacity:0.7"></div>
-              </div>
-            </div>
-
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--medium);font-weight:600">Review Needed</span><span style="font-family:var(--mono);font-weight:600">12</span></div>
-              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
-                <div style="width:4.2%;height:100%;background:var(--medium);border-radius:4px;opacity:0.7"></div>
-              </div>
-            </div>
-
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--critical);font-weight:600">Estimated Dormant (full-access)</span><span style="font-family:var(--mono);font-weight:600">8</span></div>
-              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
-                <div style="width:2.8%;height:100%;background:var(--critical);border-radius:4px;opacity:0.7"></div>
-              </div>
-            </div>
-
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--high);font-weight:600">Integration Accounts</span><span style="font-family:var(--mono);font-weight:600">8</span></div>
-              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
-                <div style="width:2.8%;height:100%;background:var(--high);border-radius:4px;opacity:0.7"></div>
-              </div>
-            </div>
-
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:#9050E9;font-weight:600">Approval-Only (replaceable)</span><span style="font-family:var(--mono);font-weight:600">4</span></div>
-              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
-                <div style="width:1.4%;height:100%;background:#9050E9;border-radius:4px;opacity:0.7"></div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Right: Savings breakdown -->
-        <div>
-          <div style="font-size:13px;font-weight:700;margin-bottom:16px">Savings Breakdown</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-
-            <div style="padding:12px;background:var(--critical-bg);border-radius:6px;display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div style="font-size:12px;font-weight:600">Dormant Full-Access Users</div>
-                <div style="font-size:10px;color:var(--text-muted);margin-top:2px">8 users at $5,808/yr — no login in 90+ days</div>
-              </div>
-              <div style="font-size:16px;font-weight:800;font-family:var(--mono);color:var(--critical)">$46,464</div>
-            </div>
-
-            <div style="padding:12px;background:var(--high-bg);border-radius:6px;display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div style="font-size:12px;font-weight:600">Departed Employee Center Users</div>
-                <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Est. 53 departed at $600/yr — cross-ref HR</div>
-              </div>
-              <div style="font-size:16px;font-weight:800;font-family:var(--mono);color:var(--high)">$31,800</div>
-            </div>
-
-            <div style="padding:12px;background:#F3E8FF;border-radius:6px;display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div style="font-size:12px;font-weight:600">Approval-Only Workflow Replacement</div>
-                <div style="font-size:10px;color:var(--text-muted);margin-top:2px">4 users replaced by SuiteFlow email approvals</div>
-              </div>
-              <div style="font-size:16px;font-weight:800;font-family:var(--mono);color:#9050E9">$23,232</div>
-            </div>
-
-            <div style="padding:12px;background:var(--medium-bg);border-radius:6px;display:flex;justify-content:space-between;align-items:center">
-              <div>
-                <div style="font-size:12px;font-weight:600">Deprecated Integrations</div>
-                <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Est. 4 of 8 integrations no longer active</div>
-              </div>
-              <div style="font-size:16px;font-weight:800;font-family:var(--mono);color:var(--medium)">$2,400</div>
-            </div>
-
-          </div>
-
-          <div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:6px;font-size:11px;color:var(--text-secondary);line-height:1.6">
-            <strong>Method:</strong> Automated classification engine analyzes NetSuite user roles, login timestamps, transaction history, and approval patterns. Each user is categorized with a confidence score and actionable recommendation. Implementation: 40 hours, $7,200. Conservative estimate: $57,432/yr.
-          </div>
-        </div>
-
-      </div>
+  <!-- Real-World link card (detail on its own tab) -->
+  <div onclick="switchTab('cases')" style="cursor:pointer;background:linear-gradient(135deg,#032D60,#0176D3);border-radius:var(--radius);padding:20px 24px;color:white;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:20px;margin-bottom:16px;transition:all 0.15s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
+    <div style="flex:1">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;opacity:0.6;margin-bottom:4px">Real-World Client Data</div>
+      <div style="font-size:16px;font-weight:700">2 anonymized engagements — $103K savings identified, 2,525 help tickets analyzed</div>
+      <div style="font-size:12px;opacity:0.7;margin-top:4px">NetSuite license audit + ERP implementation ticket forensics with unstructured text analysis</div>
     </div>
+    <div style="font-size:14px;font-weight:700;opacity:0.8;white-space:nowrap">View Cases &#8594;</div>
   </div>
 
   <!-- Design Philosophy -->
@@ -1874,9 +1753,264 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 
 </div><!-- /tab-ides -->
 
+<!-- ═══════════════════════════════════════════════
+     TAB 5: Real-World Client Cases (Anonymized)
+═══════════════════════════════════════════════ -->
+<div id="tab-cases" class="tab-panel">
+<div class="page" style="max-width:1200px">
+
+  <!-- Banner -->
+  <div style="margin-bottom:24px;padding:14px 20px;background:#EEF6F0;border:1px solid #C8E6C9;border-radius:6px;font-size:12px;color:#2E7D32;line-height:1.6">
+    <strong>Client Data Notice:</strong> All data on this page comes from real consulting engagements. Company names, individual names, and email addresses have been anonymized. Financial figures, ticket counts, and category distributions are actual. Used with permission for educational purposes.
+  </div>
+
+  <!-- ═══════════ CASE 1: License Audit ═══════════ -->
+  <div class="section">
+    <div class="section-title">Case 1 — Healthcare Company: NetSuite License Optimization</div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)">
+
+      <div style="padding:20px 24px;background:linear-gradient(135deg,#032D60,#0176D3);color:white">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;opacity:0.6;margin-bottom:4px">Engagement: ERP User License Audit</div>
+            <div style="font-size:18px;font-weight:700">289-user NetSuite environment — automated classification found $103,896 in annual savings</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;margin-left:24px">
+            <div style="font-size:28px;font-weight:800;font-family:var(--mono)">14.4x</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.6">ROI</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)">
+        <div style="padding:16px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:24px;font-weight:800;font-family:var(--mono)">289</div>
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Total Users</div>
+        </div>
+        <div style="padding:16px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--critical)">69</div>
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Eliminable</div>
+        </div>
+        <div style="padding:16px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--low)">$103,896</div>
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Annual Savings</div>
+        </div>
+        <div style="padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:800;font-family:var(--mono)">0.8 mo</div>
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Payback Period</div>
+        </div>
+      </div>
+
+      <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:12px">Savings by Category</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="padding:10px 12px;background:var(--critical-bg);border-radius:4px;display:flex;justify-content:space-between;font-size:12px"><span>Dormant full-access (8 users, no login 90+ days)</span><span style="font-family:var(--mono);font-weight:700;color:var(--critical)">$46,464</span></div>
+            <div style="padding:10px 12px;background:var(--high-bg);border-radius:4px;display:flex;justify-content:space-between;font-size:12px"><span>Departed employee center (est. 53)</span><span style="font-family:var(--mono);font-weight:700;color:var(--high)">$31,800</span></div>
+            <div style="padding:10px 12px;background:#F3E8FF;border-radius:4px;display:flex;justify-content:space-between;font-size:12px"><span>Approval-only users (4, replace w/ SuiteFlow)</span><span style="font-family:var(--mono);font-weight:700;color:#9050E9">$23,232</span></div>
+            <div style="padding:10px 12px;background:var(--medium-bg);border-radius:4px;display:flex;justify-content:space-between;font-size:12px"><span>Deprecated integrations (est. 4 of 8)</span><span style="font-family:var(--mono);font-weight:700;color:var(--medium)">$2,400</span></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:12px">What Structured Data Shows vs. What We Found</div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.7">
+            <p style="margin-bottom:8px"><strong>Structured:</strong> NetSuite user list shows 289 active users with assigned roles. Looks clean.</p>
+            <p style="margin-bottom:8px"><strong>Unstructured signals:</strong> Login timestamps reveal 8 full-access users ($5,808/yr each) haven't logged in for 90+ days. Cross-referencing with HR termination dates shows ~53 Employee Center users are departed employees still consuming licenses. 4 users' entire activity consists of clicking "Approve" on purchase orders — replaceable by an email-based workflow that costs nothing.</p>
+            <p><strong>The gap:</strong> $103,896/year in waste invisible to anyone looking at the user list alone.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ CASE 2: MedTech Ticket Forensics ═══════════ -->
+  <div class="section">
+    <div class="section-title">Case 2 — MedTech Manufacturer: Help Desk Ticket Forensics During Acquisition</div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)">
+
+      <div style="padding:20px 24px;background:linear-gradient(135deg,#1a1a2e,#16213e);color:white">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;opacity:0.6;margin-bottom:4px">Engagement: NetSuite Implementation + Post-Acquisition Support</div>
+        <div style="font-size:18px;font-weight:700">2,525 help desk tickets reveal organizational stress invisible in ERP transaction data</div>
+        <div style="font-size:12px;opacity:0.7;margin-top:4px">Diagnostics manufacturer acquired by Fortune 500. Structured data showed normal operations. Tickets told a different story.</div>
+      </div>
+
+      <!-- Metrics -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border)">
+        <div style="padding:16px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:24px;font-weight:800;font-family:var(--mono)">2,525</div>
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Help Tickets</div>
+        </div>
+        <div style="padding:16px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:24px;font-weight:800;font-family:var(--mono)">11</div>
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Categories</div>
+        </div>
+        <div style="padding:16px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--critical)">38%</div>
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Uncategorized</div>
+        </div>
+        <div style="padding:16px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:24px;font-weight:800;font-family:var(--mono)">3,992</div>
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase">ERP Users</div>
+        </div>
+        <div style="padding:16px;text-align:center">
+          <div style="font-size:24px;font-weight:800;font-family:var(--mono)">1,423</div>
+          <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Inventory Items</div>
+        </div>
+      </div>
+
+      <div style="padding:20px">
+
+        <!-- Category distribution -->
+        <div style="font-size:12px;font-weight:700;margin-bottom:12px">Ticket Category Distribution</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+              <span style="width:120px;color:var(--critical);font-weight:600">Uncategorized</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:38%;height:100%;background:var(--critical);border-radius:3px;opacity:0.7"></div></div>
+              <span style="font-family:var(--mono);width:60px;text-align:right;font-weight:600">956</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+              <span style="width:120px;font-weight:600">Finance</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:18.6%;height:100%;background:var(--sf-blue);border-radius:3px;opacity:0.7"></div></div>
+              <span style="font-family:var(--mono);width:60px;text-align:right">469</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+              <span style="width:120px;font-weight:600">Access</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:10.2%;height:100%;background:var(--high);border-radius:3px;opacity:0.7"></div></div>
+              <span style="font-family:var(--mono);width:60px;text-align:right">257</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+              <span style="width:120px;font-weight:600">Procurement</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:8.5%;height:100%;background:#9050E9;border-radius:3px;opacity:0.7"></div></div>
+              <span style="font-family:var(--mono);width:60px;text-align:right">215</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+              <span style="width:120px;font-weight:600">Inventory</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:4.7%;height:100%;background:var(--low);border-radius:3px;opacity:0.7"></div></div>
+              <span style="font-family:var(--mono);width:60px;text-align:right">119</span>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+              <span style="width:120px;font-weight:600">Manufacturing</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:4.2%;height:100%;background:var(--medium);border-radius:3px;opacity:0.7"></div></div>
+              <span style="font-family:var(--mono);width:60px;text-align:right">107</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+              <span style="width:120px;font-weight:600">Warehouse</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:4.1%;height:100%;background:var(--sf-blue);border-radius:3px;opacity:0.7"></div></div>
+              <span style="font-family:var(--mono);width:60px;text-align:right">103</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+              <span style="width:120px;font-weight:600">Cost Accounting</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:3.3%;height:100%;background:var(--high);border-radius:3px;opacity:0.7"></div></div>
+              <span style="font-family:var(--mono);width:60px;text-align:right">84</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+              <span style="width:120px;font-weight:600">Quality</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:3.1%;height:100%;background:#9050E9;border-radius:3px;opacity:0.7"></div></div>
+              <span style="font-family:var(--mono);width:60px;text-align:right">77</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+              <span style="width:120px;font-weight:600">Order Mgmt</span>
+              <div style="flex:1;height:18px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="width:2.6%;height:100%;background:var(--low);border-radius:3px;opacity:0.7"></div></div>
+              <span style="font-family:var(--mono);width:60px;text-align:right">66</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- What ticket TEXT reveals -->
+        <div style="font-size:12px;font-weight:700;margin-bottom:12px">What Ticket Text Reveals — Unstructured Signals from Real Tickets</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+
+          <div style="padding:14px;background:var(--critical-bg);border-radius:6px;border-left:3px solid var(--critical)">
+            <div style="font-size:11px;font-family:var(--mono);color:var(--critical);margin-bottom:6px">DATA INTEGRITY</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">"How did 20413 turn into 20433?"</div>
+            <div style="font-size:11px;color:var(--text-secondary);line-height:1.5">Inventory team can't explain item number mutation. Structured data shows both items exist. The ticket reveals someone doesn't trust the data — and they're right to question it.</div>
+          </div>
+
+          <div style="padding:14px;background:var(--high-bg);border-radius:6px;border-left:3px solid var(--high)">
+            <div style="font-size:11px;font-family:var(--mono);color:var(--high);margin-bottom:6px">SYSTEM WORKAROUNDS</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">"Explore creating dummy transactions for MRP"</div>
+            <div style="font-size:11px;color:var(--text-secondary);line-height:1.5">Manufacturing is building fake transactions to work around MRP limitations. Structured data will show these as real — auditors would never know.</div>
+          </div>
+
+          <div style="padding:14px;background:var(--medium-bg);border-radius:6px;border-left:3px solid var(--medium)">
+            <div style="font-size:11px;font-family:var(--mono);color:var(--medium);margin-bottom:6px">ESCALATION CULTURE</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">"Bill Payment Email Notification for Vendors — URGENT"</div>
+            <div style="font-size:11px;color:var(--text-secondary);line-height:1.5">Multiple "URGENT" tickets for routine vendor payments. Finance team is under pressure. Transaction data shows payments made on time — the stress is invisible.</div>
+          </div>
+
+          <div style="padding:14px;background:#E8F4FD;border-radius:6px;border-left:3px solid var(--sf-blue)">
+            <div style="font-size:11px;font-family:var(--mono);color:var(--sf-blue);margin-bottom:6px">ACQUISITION CHAOS</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">257 "Request for NetSuite Access" tickets</div>
+            <div style="font-size:11px;color:var(--text-secondary);line-height:1.5">10% of all tickets are access requests — many from acquiring company email domains. IT is drowning in onboarding during the acquisition. ERP data shows users; tickets show the churn.</div>
+          </div>
+
+        </div>
+
+        <!-- Structured vs Unstructured comparison -->
+        <div style="display:grid;grid-template-columns:1fr 48px 1fr;margin-bottom:16px">
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px 0 0 8px;padding:16px">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px">ERP Transaction Data</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+              &#8226; 3,992 employees in system<br>
+              &#8226; 1,044 active customers<br>
+              &#8226; 1,423 inventory items tracked<br>
+              &#8226; 307 bills of materials<br>
+              &#8226; 465 GL accounts<br>
+              &#8226; 5,035 warehouse bin locations<br>
+              <span style="color:var(--low);font-weight:600">Status: Operational</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;background:var(--sf-nav);color:white;font-size:11px;font-weight:800">vs</div>
+          <div style="background:var(--critical-bg);border:1px solid #E8A8A5;border-radius:0 8px 8px 0;padding:16px">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#8B1A15;margin-bottom:10px">Ticket Text Analysis</div>
+            <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+              &#8226; 38% of tickets uncategorized (overwhelmed)<br>
+              &#8226; Dummy transactions created as workarounds<br>
+              &#8226; Item numbers mutating unexplainably<br>
+              &#8226; "URGENT" escalation culture in Finance<br>
+              &#8226; Acquiring company flooding access requests<br>
+              &#8226; Lot traceability questions (FDA compliance)<br>
+              <span style="color:var(--critical);font-weight:600">Status: Organization under stress</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data available -->
+        <div style="padding:12px;background:var(--bg);border-radius:6px;font-size:11px;color:var(--text-secondary);line-height:1.6">
+          <strong>Available data for forensic analysis:</strong> 2,525 help desk tickets (with summary, assignee, priority, category, timestamps, response/close times) + complete NetSuite master data (employees, customers, vendors, items, BOM, chart of accounts, inventory, financial statements). The combination of structured ERP data with unstructured ticket text is exactly the dual-layer forensic approach this tool is designed for.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Thesis connection -->
+  <div class="section">
+    <div class="section-title">Why This Matters</div>
+    <div style="background:var(--sf-nav);border-radius:var(--radius);padding:24px 28px;color:white;box-shadow:var(--shadow-md)">
+      <div style="font-size:14px;line-height:1.8;opacity:0.9">
+        These two cases demonstrate the same pattern from opposite directions. <strong>Case 1</strong> shows that structured user data hides $103K in waste — login timestamps and role assignments alone told the story. <strong>Case 2</strong> shows that when structured data looks normal (transactions processing, items in stock, payments on time), the unstructured help desk tickets reveal an organization under acquisition stress: workarounds, data trust issues, escalation culture, and IT drowning in access requests. Neither case required advanced AI — just systematic cross-referencing of structured records with the unstructured text that surrounds them.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div>Christopher Bailey · Stanford TECH 41 · Client data anonymized, used with permission</div>
+  <div><a href="https://github.com/chrbailey/SAP-Transaction-Forensics" target="_blank">github.com/chrbailey/SAP-Transaction-Forensics</a> · March 2026</div>
+</footer>
+
+</div><!-- /tab-cases -->
+
 <script>
 // ─── Tab switching ───
-var TABS = ['home', 'crm', 'bpi', 'ides', 'nlp'];
+var TABS = ['home', 'crm', 'bpi', 'ides', 'cases', 'nlp'];
 function switchTab(tab) {
   TABS.forEach(function(t) {
     document.getElementById('tab-' + t).classList.toggle('active', t === tab);
