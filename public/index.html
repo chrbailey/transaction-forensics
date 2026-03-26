@@ -451,7 +451,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 
         <div style="padding:14px;background:var(--bg);border-radius:6px;border-left:3px solid var(--high)">
           <div style="font-size:12px;font-weight:700;margin-bottom:6px">HERB: Approvals in Slack, Not Systems</div>
-          <div style="font-size:11px;color:var(--text-secondary);line-height:1.6">37,064 enterprise messages analyzed. <strong>1,226 "LGTM/Approved" messages found in Slack channels</strong> — informal approvals with no audit trail. Structured approval workflows show no record of these decisions.</div>
+          <div style="font-size:11px;color:var(--text-secondary);line-height:1.6">37,064 enterprise documents analyzed (32.8K Slack messages, 3.6K pull requests, 400 docs, 321 transcripts). <strong>1,226 "LGTM/Approved" messages found in Slack channels</strong> — informal approvals with no audit trail. Structured approval workflows show no record of these decisions.</div>
           <div style="margin-top:8px;font-size:10px;font-family:var(--mono);color:var(--high);cursor:pointer" onclick="switchTab('nlp')">See NLP Patterns tab &#8594;</div>
         </div>
 
@@ -596,7 +596,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       <div onclick="switchTab('nlp')" style="cursor:pointer;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);transition:all 0.15s;border-top:4px solid #9050E9" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.12)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
         <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:#9050E9;margin-bottom:4px">37K</div>
         <div style="font-size:14px;font-weight:700;margin-bottom:8px">NLP Pattern Analysis</div>
-        <div style="font-size:12px;color:var(--text-secondary);line-height:1.5">Salesforce HERB communication mining — 37K messages clustered into patterns, network graphs, bridge users, team dynamics.</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.5">Salesforce HERB — 37K documents (Slack, PRs, transcripts) clustered into communication patterns. Network graphs, bridge users, team dynamics.</div>
         <div style="margin-top:12px;font-size:11px;color:#9050E9;font-weight:600">Explore &#8594;</div>
       </div>
 
@@ -1337,7 +1337,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       <div style="font-size:14px;font-weight:700;color:var(--sf-blue-dark)">View Analysis Code on GitHub</div>
       <div style="font-size:12px;color:var(--sf-blue-dark);opacity:0.7;margin-top:2px">This is an analysis tool, not a hosted service. Clone the repo to run the pattern engine on your own Slack exports, case comments, or CRM data with text fields and timestamps.</div>
     </div>
-    <a href="https://github.com/chrbailey/transaction-forensics" target="_blank" style="padding:8px 16px;background:var(--sf-blue);color:white;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap">View on GitHub →</a>
+    <a href="https://github.com/chrbailey/SAP-Transaction-Forensics" target="_blank" style="padding:8px 16px;background:var(--sf-blue);color:white;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap">View on GitHub →</a>
   </div>
 </div>
 
@@ -2067,9 +2067,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 
           <div style="padding:14px;background:var(--medium-bg);border-radius:6px;border-left:3px solid var(--medium)">
             <div style="font-size:11px;font-family:var(--mono);color:var(--medium);margin-bottom:6px">RETURN RATE ANOMALY</div>
-            <div style="font-size:13px;font-weight:600;margin-bottom:4px">28.62% RMA rate — nearly 1 in 3 orders returned</div>
-            <div style="font-size:11px;color:var(--text-secondary);line-height:1.5">97K return authorizations across 6 RMA types: Open Box (624), Closed Box (201), Destroyed in Field (84), Stock Rotation (28), Warranty (20), Error Shipment (12), Refused (13). Only 67.52% on-time delivery. Transaction data shows the returns; memo fields and reason codes hint at systemic quality or logistics failures.</div>
-            <div style="margin-top:6px;font-size:10px;font-family:var(--mono);color:var(--text-muted)">Source: RMA Extract + Case Outcome Analysis (1,090 cases)</div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:4px">28.62% of customer accounts had return events — only 67.5% on-time delivery</div>
+            <div style="font-size:11px;color:var(--text-secondary);line-height:1.5">Forensic case analysis of 1,090 customer accounts: 312 had at least one RMA event (28.62%). 97K total RMA line items in the extract across 6 types: Open Box, Closed Box, Destroyed in Field, Stock Rotation, Warranty, Error Shipment. Transaction data shows the returns; memo fields and reason codes hint at systemic quality or logistics failures the structured data can't explain.</div>
+            <div style="margin-top:6px;font-size:10px;font-family:var(--mono);color:var(--text-muted)">Source: Case Outcome Analysis (1,090 accounts, 21,099 events) + RMA Extract (97K line items)</div>
           </div>
 
           <div style="padding:14px;background:#E8F4FD;border-radius:6px;border-left:3px solid var(--sf-blue)">

@@ -1,9 +1,11 @@
 # Transaction Forensics
 
-**Enterprise process analysis with two lenses: CRM pipeline forensics (conformance checking) and NLP communication pattern clustering.**
+**Structured data tells you what happened. Unstructured text tells you why.**
+
+Automated process mining engine that combines ERP transaction logs with the unstructured text that surrounds them — emails, Slack messages, help desk tickets, progress reports, and order notes — to surface discrepancies between what organizations report and what actually happened.
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://transaction-forensics.vercel.app)
-[![Data Source](https://img.shields.io/badge/data-Salesforce%2FHERB-blue)](https://huggingface.co/datasets/Salesforce/HERB)
+[![Companion Repo](https://img.shields.io/badge/engine-SAP--Transaction--Forensics-blue)](https://github.com/chrbailey/SAP-Transaction-Forensics)
 [![Python](https://img.shields.io/badge/python-3.11-blue)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -12,130 +14,132 @@
 
 ---
 
-## What It Does
-
-Two analysis tabs in a single viewer:
-
-- **CRM Pipeline Forensics** — Conformance checking of 8,800 Kaggle CRM sales opportunities against an aspirational 8-stage pipeline model. Detects stage skips, reversals, quarter-end compression, velocity anomalies, and account concentration.
-- **NLP Communication Patterns** — TF-IDF + KMeans clustering on 37,064 enterprise communications from Salesforce's HERB dataset. Surfaces compliance risks, approval bottlenecks, knowledge silos, and communication gaps.
-
 ## Live Demo
 
-**[transaction-forensics.vercel.app](https://transaction-forensics.vercel.app)**
+**[transaction-forensics.vercel.app](https://transaction-forensics.vercel.app)** — 6 analysis tabs, zero dependencies, works offline.
 
-Both tabs are live. CRM tab uses Kaggle CRM Sales Opportunities data; NLP tab uses Salesforce/HERB.
+## What It Does
 
-## Pipeline (v3.0)
+Six forensic lenses on enterprise process data:
 
-9 stages, ~109 seconds total (no GPU required):
+| Tab | Data Source | Scale | Key Finding |
+|-----|-----------|-------|-------------|
+| **Overview** | Architecture + thesis | — | Structured vs. unstructured gap analysis with evidence |
+| **CRM Pipeline** | Kaggle CRM Sales Opportunities | 8,800 opportunities | Win rates, velocity patterns, quarter-end compression |
+| **BPI Challenge** | BPI Challenge 2019 (4TU.ResearchData) | 251,734 purchase orders, 1.6M events | 57K payment blocks, process variability, resource concentration |
+| **IDES Compliance** | SAP IDES Demo System (sap-extractor) | 3,132 cases (O2C + P2P) | **7 compliance violations** in SAP's own reference data |
+| **Client Cases** | 3 anonymized consulting engagements | 3M+ ERP records | $103K savings, 2,525 tickets, credit hold overrides, SOD violations |
+| **NLP Patterns** | Salesforce/HERB (HuggingFace) | 37,064 documents | 11 communication clusters, approval bottlenecks, knowledge silos |
 
-| # | Stage | Method | Details |
-|---|-------|--------|---------|
-| 1 | Ingest | File parsing | 37,064 docs from 30 products (Slack, transcripts, docs, PRs) |
-| 2 | Normalize | Text cleaning | 31 abbreviation expansions, URL stripping, Slack link unwrapping |
-| 3 | BERTopic | SBERT + HDBSCAN | Sentence-transformer embeddings, topic modeling (silhouette: 0.09) |
-| 4 | KMeans | TF-IDF + KMeans | 5,000 features, (1,3) n-grams, silhouette-optimized k (silhouette: 0.028) |
-| 5 | Network | Communication graph | NetworkX, Louvain communities, centrality analysis, bridge users |
-| 6 | Temporal | Change-point detection | Activity windows, volume spikes, temporal clustering |
-| 7 | Stability | Bootstrap (50 runs) | Cluster stability via resampled KMeans, pruning unstable clusters |
-| 8 | Build cards | Evidence metrics | Severity classification, confidence scoring, pattern typing |
-| 9 | Report | JSON + HTML | Pattern cards with provenance, deployed as static viewer |
+## The Thesis
 
-**Cluster quality caveat:** Global silhouette scores are low (0.028 KMeans / 0.09 BERTopic), indicating weak cluster separation. Findings should be treated as exploratory signals, not confirmed patterns. The Pipeline Transparency section in the viewer documents all parameters.
+Every enterprise system generates two kinds of data:
+
+- **Structured transactions** — timestamps, amounts, stage changes, user IDs — the official story.
+- **Unstructured text** — emails, Slack threads, help desk tickets, timesheets, SOWs — what actually happened.
+
+The gap between them is where fraud, waste, and dysfunction hide. This tool automates finding those discrepancies at scale.
+
+**Examples from our analysis:**
+- SAP IDES: A Purchase Order was created *before* its Purchase Requisition — approval was documented retroactively. Only detectable by cross-referencing timestamps.
+- Salesforce HERB: 1,226 "LGTM/Approved" decisions made in Slack with no audit trail. Formal approval systems show nothing.
+- BPI Challenge: 22.7% of purchase orders hit payment blocks, but the event log can't explain why — that answer lives in vendor correspondence.
+- Client Case: Sales orders shipped despite "Customer On Credit Hold" flag. The override field tells you it shouldn't have been.
+
+## Real-World Evidence
+
+Three anonymized client engagements demonstrate the pattern:
+
+1. **Healthcare SaaS** — 289 NetSuite users. Automated classification found $103,896/year in waste (dormant accounts, departed employees, replaceable approval-only users). 14.4x ROI, 0.8-month payback.
+
+2. **MedTech Manufacturer (during acquisition)** — 2,525 help desk tickets. Structured ERP data showed "operational." Tickets revealed: dummy transactions as MRP workarounds, data integrity questions ("How did 20413 turn into 20433?"), URGENT escalation culture, and an acquisition wave visible in email domain changes.
+
+3. **Connected Hardware Manufacturer (high-growth)** — 3M+ ERP records (102K sales orders, 97K RMA line items, 43K vendors). Forensic case analysis of 1,090 customer accounts: 28.6% had return events, only 67.5% on-time delivery. ITGC audit (Big Four): 7 users with Administrator role, terminated employee still active, no change management policy. Approval chains so broken that a "reroute approver" field exists in the schema.
+
+## Architecture
+
+The forensic engine (in the [companion repo](https://github.com/chrbailey/SAP-Transaction-Forensics)) processes data through:
+
+```
+Data Sources          Adapters (7)         Analysis Engines (4)       Output
+─────────────        ──────────────       ─────────────────────      ──────────
+SAP ERP (IDES)   →                    →   Conformance Checker    →   Compliance Violations
+Salesforce CRM   →   IDataAdapter     →   Temporal Analyzer      →   Bottleneck Reports
+BPI Challenge    →   (normalize to    →   Pattern Clustering     →   Pattern Cards
+Slack/HERB       →    unified event   →   Cross-System Resolver  →   Evidence Ledger
+NetSuite ERP     →    log)
+CSV / Custom     →
+```
+
+- **834 tests** (602 TypeScript + 232 Python)
+- **Deterministic** — all analysis uses `seed=42`
+- **Reproducible** — `make demo` for one-command bootstrap
+
+## NLP Pipeline (v3.0)
+
+9 stages, ~109 seconds, no GPU required:
+
+| Stage | Method | Output |
+|-------|--------|--------|
+| Ingest | File parsing | 37,064 docs from 30 products (32.8K Slack, 3.6K PRs, 400 docs, 321 transcripts) |
+| Normalize | Text cleaning | 31 abbreviation expansions, URL/Slack link unwrapping |
+| BERTopic | SBERT + HDBSCAN | Sentence-transformer topic modeling (silhouette: 0.09) |
+| KMeans | TF-IDF + KMeans | 5,000 features, (1,3) n-grams, silhouette-optimized k (0.028) |
+| Network | Communication graph | 521 nodes, 8,406 edges, 7 communities, 5 bridge users |
+| Temporal | Change-point detection | Activity windows, volume spikes, temporal clustering |
+| Stability | Bootstrap (50 runs) | Cluster stability, pruning unstable patterns |
+| Build cards | Evidence metrics | Severity, confidence, pattern typing |
+| Report | JSON + HTML | Pattern cards deployed as static viewer |
+
+**Cluster quality caveat:** Low silhouette scores (0.028 KMeans / 0.09 BERTopic) indicate weak cluster separation. Findings are exploratory signals, not confirmed patterns. This is documented transparently in the viewer.
 
 ## Quick Start
 
 ```bash
-# Clone
 git clone https://github.com/chrbailey/transaction-forensics.git
 cd transaction-forensics
 
 # Install dependencies
 pip install scikit-learn pandas numpy datasets sentence-transformers hdbscan networkx
 
-# Download HERB dataset (one-time, ~200MB)
-python -c "from datasets import load_dataset; load_dataset('Salesforce/HERB')"
-
-# Run the full pipeline (~109 seconds)
+# Run NLP pipeline (~109 seconds)
 python3.11 analyze.py
 
-# Open results
+# View results
 open public/index.html
 ```
 
-## Architecture
-
+For the full forensic engine (conformance checking, data adapters, cross-system correlation):
+```bash
+git clone https://github.com/chrbailey/SAP-Transaction-Forensics.git
+cd SAP-Transaction-Forensics
+make demo    # one-command deterministic bootstrap
+make test    # 834 tests
 ```
-transaction-forensics/
-├── analyze.py              # Main pipeline (9 stages)
-├── bertopic_cluster.py     # BERTopic clustering module
-├── network_analysis.py     # Communication graph + communities
-├── temporal_analysis.py    # Change-point detection
-├── public/
-│   ├── index.html          # Two-tab viewer (CRM + NLP)
-│   └── pattern_cards.json  # NLP analysis output (generated)
-└── README.md
-```
-
-### Viewer Features
-
-- **Two analysis tabs** — CRM Pipeline Forensics + NLP Communication Patterns
-- **Severity filtering** — Critical / High / Medium / Low
-- **Type filtering** — Compliance, Bottleneck, Communication, Approval, Anomaly, Escalation
-- **Free-text search** — Across titles, descriptions, phrases, products, teams
-- **Detail panel** — Evidence quotes, affected scope, recommendations, caveats
-- **Pipeline transparency** — Expandable section showing computation stages and parameters
-- **Export** — Download findings as JSON
-- **Zero dependencies** — No framework, no build step, works offline
-
-## Sample Findings
-
-### CRM Tab (Kaggle Data)
-
-| Finding | Value |
-|---------|-------|
-| Opportunities analyzed | 8,800 (closed + open) |
-| Win rate | 47.2% of closed deals |
-| Avg fitness score | 0.05 (against aspirational 8-stage model) |
-| Quarter-end concentration | Varies by dataset period |
-| Top account concentration (CR5) | Top 5 accounts drive majority of won revenue |
-
-### NLP Tab (HERB Data)
-
-| Severity | Pattern | Documents |
-|----------|---------|-----------|
-| Critical | Customer data references in public Slack channels | ~12K |
-| High | API/integration work siloed across product teams | ~4K |
-| Medium | Pull request discussions outside review tools | ~3.5K |
-| Medium | Informal approval patterns (LGTM culture) | ~590 |
-| Low | Positive sentiment baseline for morale tracking | ~2.2K |
-
-**Note:** NLP cluster confidence scores reflect actual silhouette quality. Low silhouette means these are directional signals, not high-confidence classifications.
 
 ## Data Sources
 
-- **CRM tab:** [Kaggle CRM Sales Opportunities](https://www.kaggle.com/datasets/innocentmfa/crm-sales-opportunities) (Apache 2.0 license) — 8,800 opportunities, 85 accounts
-- **NLP tab:** [Salesforce/HERB](https://huggingface.co/datasets/Salesforce/HERB) (CC-BY-NC-4.0) — 37,064 enterprise communications across 30 product teams, 120 customers, 18 team members. Note: HERB contains synthetic timestamps extending to 2027.
+| Dataset | License | Records | Used In |
+|---------|---------|---------|---------|
+| [Kaggle CRM Sales Opportunities](https://www.kaggle.com/datasets/innocentmfa/crm-sales-opportunities) | Apache 2.0 | 8,800 opportunities | CRM tab |
+| [BPI Challenge 2019](https://data.4tu.nl/articles/dataset/BPI_Challenge_2019/12715853) | CC BY 4.0 | 251,734 POs, 1.6M events | BPI tab |
+| SAP IDES (via [sap-extractor](https://github.com/simonmittag/sap-extractor)) | MIT | 3,132 cases | IDES tab |
+| [Salesforce/HERB](https://huggingface.co/datasets/Salesforce/HERB) | CC-BY-NC-4.0 | 37,064 documents | NLP tab |
+| Client data (anonymized) | Permission granted | 3M+ records | Client Cases tab |
 
-## Related
+## How AI Was Used
 
-The CRM conformance engine, data adapters (SAP RFC, OData, SFDC, CSV, and more), and cross-system correlation logic live in the companion repo: [SAP-Transaction-Forensics](https://github.com/chrbailey/SAP-Transaction-Forensics).
+| What I Did (Christopher Bailey) | What Claude Code Did (AI Pair-Programmer) |
+|---|---|
+| Defined the problem space and research questions | Implemented data adapters and parsers (TypeScript) |
+| Selected data sources and licensed datasets | Built pattern engine and clustering pipeline (Python) |
+| Designed the adapter architecture and analysis pipeline | Wrote conformance checking engine |
+| Chose conformance algorithms (van der Aalst token replay) | Generated test suites (834 tests) |
+| Interpreted findings and wrote forensic narratives | Built the 6-tab dashboard (vanilla HTML/CSS/JS) |
+| Determined what's a real finding vs. a statistical artifact | Statistical computations (effect sizing, CI, p-values) |
+| Real-world client engagements and domain expertise (20 yrs ERP) | All code in git history with co-author tags |
 
-## Technology Stack
-
-| Component | Technology |
-|-----------|-----------|
-| Analysis | Python 3.11, scikit-learn, pandas, numpy |
-| NLP | TF-IDF vectorization, BERTopic (sentence-transformers + HDBSCAN) |
-| Network | NetworkX, Louvain community detection |
-| Clustering | KMeans + BERTopic with silhouette optimization |
-| Frontend | Vanilla HTML/CSS/JS (zero dependencies) |
-| Deployment | Vercel (static) |
-| Data | HuggingFace Datasets, Kaggle |
-
-## AI Authorship
-
-This project was built with Claude Code (Anthropic). All commits are co-authored as reflected in git history. The architecture, design decisions, and analysis methodology are the author's; the implementation was pair-programmed with AI assistance.
+Claude Code is a force multiplier. The AI doesn't know what's worth finding — it doesn't know that a PO-before-PR is a Sarbanes-Oxley risk, or that 22.7% payment block rates are 4x industry norms. Domain expertise decides what to look for; AI makes looking fast.
 
 ## Author
 
