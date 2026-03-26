@@ -754,6 +754,100 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 
 </div><!-- /page -->
 
+<!-- Pipeline Transparency — CRM Tab -->
+<div style="max-width:1600px;margin:0 auto;padding:0 32px 24px">
+  <div style="border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);overflow:hidden">
+    <button id="crm-pipeline-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'; this.querySelector('span').textContent=this.nextElementSibling.style.display==='none'?'▸ Pipeline Transparency — How This Analysis Works':'▾ Pipeline Transparency — How This Analysis Works'" style="width:100%;padding:14px 24px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-family:var(--font);font-size:14px;font-weight:700;color:var(--text)">
+      <span>▸ Pipeline Transparency — How This Analysis Works</span>
+      <span style="font-size:11px;color:var(--text-muted);font-weight:400">Click to expand</span>
+    </button>
+    <div style="display:none;padding:0 24px 24px;border-top:1px solid var(--border)">
+
+      <!-- Pipeline stages -->
+      <div style="display:flex;gap:8px;align-items:center;margin:16px 0 24px;flex-wrap:wrap">
+        <div style="padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;color:white;background:#0176D3">CSV Ingest</div>
+        <div style="color:var(--text-muted)">→</div>
+        <div style="padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;color:white;background:#9050E9">SFDC Normalize</div>
+        <div style="color:var(--text-muted)">→</div>
+        <div style="padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;color:white;background:#E87722">Event Log Build</div>
+        <div style="color:var(--text-muted)">→</div>
+        <div style="padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;color:white;background:#2E844A">Conformance Check</div>
+        <div style="color:var(--text-muted)">→</div>
+        <div style="padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;color:white;background:#C23934">Pattern Detection</div>
+        <div style="color:var(--text-muted)">→</div>
+        <div style="padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;color:white;background:#032D60">Report</div>
+      </div>
+
+      <!-- Stage details -->
+      <div style="margin-bottom:16px;padding:16px;background:var(--bg);border-radius:8px;border-left:3px solid #0176D3">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">Stage 1: CSV Ingest</div>
+        <div style="font-size:12px;font-family:var(--mono);color:var(--text-secondary);line-height:1.8">
+          Source: Kaggle CRM Sales Opportunities (innocentmfa)<br>
+          Files: sales_pipeline.csv (8,800 rows), accounts.csv (85), products.csv (7), sales_teams.csv (35)<br>
+          Converter: convert_kaggle_crm.py maps CSV fields to SFDC JSON schema
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;padding:16px;background:var(--bg);border-radius:8px;border-left:3px solid #9050E9">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">Stage 2: SFDC Normalization</div>
+        <div style="font-size:12px;font-family:var(--mono);color:var(--text-secondary);line-height:1.8">
+          Adapter: SFDCSyntheticAdapter implements IDataAdapter (8 methods)<br>
+          Field mapper: Opportunity.Id → VBELN, Account.Id → KUNNR, Amount → NETWR<br>
+          Pipeline models: Prospecting → Qualification → Needs Analysis → ... → Closed Won<br>
+          Stage mapping: "Engaging" → "Qualification", "Won" → "Closed Won", "Lost" → "Closed Lost"
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;padding:16px;background:var(--bg);border-radius:8px;border-left:3px solid #E87722">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">Stage 3: Event Log Construction</div>
+        <div style="font-size:12px;font-family:var(--mono);color:var(--text-secondary);line-height:1.8">
+          Records: 49,408 events from 8,800 opportunities<br>
+          Stage transitions: 31,787 entries (with synthetic intermediate stages for Won deals)<br>
+          Activities: 17,621 task records (product-related subjects)<br>
+          Format: case_id, activity, timestamp, resource, attributes
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;padding:16px;background:var(--bg);border-radius:8px;border-left:3px solid #2E844A">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">Stage 4: Conformance Checking</div>
+        <div style="font-size:12px;font-family:var(--mono);color:var(--text-secondary);line-height:1.8">
+          Algorithm: Token-based replay (van der Aalst, 2016)<br>
+          Model: sfdc_new_business — 8-stage pipeline with mandatory transitions<br>
+          Cases: 8,300 analyzed | Fitness range: 0.00 – 0.10 (real data lacks full stage coverage)<br>
+          Deviations: 53,862 total (45,386 missing_activity, 8,476 skipped_activity)
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;padding:16px;background:var(--bg);border-radius:8px;border-left:3px solid #C23934">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px">Stage 5: Pattern Detection</div>
+        <div style="font-size:12px;font-family:var(--mono);color:var(--text-secondary);line-height:1.8">
+          Quarter-end compression: 38.4% of closes in QE months (1.5x baseline)<br>
+          Deal velocity bimodal: 42.9% close within 30 days, 22.8% take 91-180 days<br>
+          Agent spread: 15-point win rate range (55%–70%) across 30 agents<br>
+          Account concentration: Top 5 = 12.1% of revenue (healthy diversification)
+        </div>
+      </div>
+
+      <!-- Technology stack -->
+      <div style="margin-top:20px;padding:16px;background:#F0EDFF;border-radius:8px;border-left:3px solid #9050E9">
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#9050E9">Technology Stack</div>
+        <div style="font-size:12px;font-family:var(--mono);color:var(--text-secondary);line-height:2">
+          MCP Server: TypeScript (ESM, strict mode), 7 data adapters<br>
+          Pattern Engine: Python 3.11, scikit-learn, scipy<br>
+          Conformance: Token-based replay, ProcessModelBuilder, van der Aalst algorithms<br>
+          Cross-System: Entity resolver (Levenshtein + proximity), unified event log<br>
+          Tests: 834 passing (602 TypeScript + 232 Python)<br>
+          Data: Kaggle CRM Sales Opportunities (Apache 2.0 license)<br>
+          Frontend: Vanilla HTML/CSS/JS (zero dependencies)<br>
+          Deployment: Vercel (static)<br>
+          Source: <a href="https://github.com/chrbailey/SAP-Transaction-Forensics" style="color:#9050E9">github.com/chrbailey/SAP-Transaction-Forensics</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <footer class="footer">
   <div>
     Transaction Forensics — Stanford TECH 41 · Data: <a href="https://www.kaggle.com/datasets/innocentmfa/crm-sales-opportunities" target="_blank">Kaggle CRM Sales Opportunities (8,800 records)</a>
