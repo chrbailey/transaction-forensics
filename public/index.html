@@ -761,13 +761,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
         <div class="finding-desc">38.4% of closed deals close in quarter-end months (Mar/Jun/Sep/Dec), vs. a 33.3% uniform baseline (4 of 12 months). The 1.15× ratio suggests mild concentration — typical in B2B sales where fiscal quarters influence buyer and seller timing. Not a strong anomaly signal on its own.</div>
       </div>
 
-      <div class="finding-card high">
+      <div class="finding-card medium">
         <div class="finding-header">
-          <div class="finding-title">Stage Conformance Gap</div>
-          <span class="badge high">High</span>
+          <div class="finding-title">Stage Conformance Gap (Expected)</div>
+          <span class="badge medium">Expected</span>
         </div>
-        <div class="finding-stat">0% conformant</div>
-        <div class="finding-desc">Zero deals in the 8,300-case closed dataset follow the full prescribed pipeline from Prospecting through Negotiation/Review to Closed Won. 53,862 individual stage deviations were detected. This indicates the CRM process model is aspirational, not operational — a significant finding for any process mining or AI training use case.</div>
+        <div class="finding-stat">Avg fitness: 0.05</div>
+        <div class="finding-desc"><strong>This is an expected result, not an anomaly.</strong> The 8-stage New Business pipeline (Prospecting → Qualification → Needs Analysis → ... → Negotiation/Review → Closed Won) is an aspirational reference model, not an operational requirement. Real-world CRM data typically records only 2-4 stages per deal. The 53,862 "missing_activity" deviations across 8,300 opportunities (closed + open) quantify the gap between prescribed process and actual practice — useful for process improvement, but not indicative of control failures. Average fitness score: 0.05.</div>
       </div>
 
       <div class="finding-card low">
@@ -887,9 +887,16 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
   </div>
 </div>
 
+<!-- AI Disclosure -->
+<div style="max-width:1600px;margin:0 auto;padding:0 32px 16px">
+  <div style="padding:12px 16px;background:#F4F6F9;border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-muted);line-height:1.6">
+    <strong>AI Authorship Disclosure:</strong> This project was built with <a href="https://claude.ai" style="color:var(--sf-blue)">Claude Code</a> (Anthropic, Opus 4.6 + Sonnet 4.6). Architecture, design decisions, data source selection, and analysis methodology are the author's. Implementation code, test suites, and data conversion scripts were pair-programmed with AI assistance. All commits are co-authored as reflected in <a href="https://github.com/chrbailey/SAP-Transaction-Forensics" style="color:var(--sf-blue)">git history</a>.
+  </div>
+</div>
+
 <footer class="footer">
   <div>
-    Transaction Forensics — Stanford TECH 41 · Data: <a href="https://www.kaggle.com/datasets/innocentmfa/crm-sales-opportunities" target="_blank">Kaggle CRM Sales Opportunities (8,800 records)</a>
+    Christopher Bailey · Stanford TECH 41 · Data: <a href="https://www.kaggle.com/datasets/innocentmfa/crm-sales-opportunities" target="_blank">Kaggle CRM Sales Opportunities (8,800 records, Apache 2.0)</a>
   </div>
   <div><a href="https://github.com/chrbailey/SAP-Transaction-Forensics" target="_blank">github.com/chrbailey/SAP-Transaction-Forensics</a> · March 2026</div>
 </footer>
@@ -961,9 +968,16 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
   </div>
 </div>
 
+<!-- AI Disclosure -->
+<div style="max-width:1600px;margin:0 auto;padding:0 32px 16px">
+  <div style="padding:12px 16px;background:#F4F6F9;border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--text-muted);line-height:1.6">
+    <strong>AI Authorship Disclosure:</strong> This project was built with <a href="https://claude.ai" style="color:var(--sf-blue)">Claude Code</a> (Anthropic). Architecture, design decisions, and analysis methodology are the author's. Implementation was pair-programmed with AI assistance. See <a href="https://github.com/chrbailey/transaction-forensics" style="color:var(--sf-blue)">git history</a> for co-authorship details.
+  </div>
+</div>
+
 <footer class="footer">
   <div>
-    <strong>Christopher Bailey</strong> · Pattern Engine v1.0 · Data: <a href="https://huggingface.co/datasets/Salesforce/HERB" target="_blank">Salesforce/HERB (HuggingFace)</a>
+    <strong>Christopher Bailey</strong> · Pattern Engine v3.0 · Data: <a href="https://huggingface.co/datasets/Salesforce/HERB" target="_blank">Salesforce/HERB (HuggingFace, CC-BY-NC-4.0)</a>
     · Pipeline: Python + scikit-learn (TF-IDF + KMeans)
   </div>
   <div>Stanford TECH 41 — Building AI Products Through Rapid Prototyping · March 2026</div>
