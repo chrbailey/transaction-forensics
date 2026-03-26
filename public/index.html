@@ -291,6 +291,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
         <div class="header-stat"><div class="header-stat-value" id="stat-source">—</div><div class="header-stat-label">Data Source</div></div>
         <div class="header-stat"><div class="header-stat-value" id="stat-messages">—</div><div class="header-stat-label">Messages Scanned</div></div>
         <div class="header-stat"><div class="header-stat-value" id="stat-products">—</div><div class="header-stat-label">Products Analyzed</div></div>
+        <div class="header-stat" style="font-size:11px;color:#7A6C1E;max-width:220px;line-height:1.3"><em>Note: HERB dataset contains synthetic timestamps extending to 2027. Temporal patterns reflect relative timing, not calendar dates.</em></div>
         <button class="header-export" id="btn-export">Export JSON ↓</button>
       </div>
     </div>
@@ -375,20 +376,20 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
         </div>
       </div>
       <div class="conformance-callout">
-        <div class="callout-box red">
-          <div class="callout-value" style="color:var(--critical)">0%</div>
-          <div class="callout-label">Fully Conformant</div>
-          <div class="callout-desc">No deal in the dataset follows all prescribed stages in the correct order. Every real-world opportunity skips at least one stage.</div>
+        <div class="callout-box" style="background:#FFF9E6;border:1px solid #E8D48B">
+          <div class="callout-value" style="color:var(--medium)">0.05</div>
+          <div class="callout-label">Avg Fitness Score</div>
+          <div class="callout-desc">Average fitness 0.05 — expected when real-world CRM data is measured against an aspirational 8-stage model. Most organizations skip stages; low conformance is typical, not alarming.</div>
         </div>
         <div class="callout-box yellow">
           <div class="callout-value" style="color:var(--medium)">53,862</div>
           <div class="callout-label">Deviations Detected</div>
-          <div class="callout-desc">Stage skips, reversals, and out-of-sequence transitions detected across 8,300 closed cases.</div>
+          <div class="callout-desc">Stage skips, reversals, and out-of-sequence transitions detected across 8,300 opportunities (closed + open) with stage history.</div>
         </div>
         <div class="callout-box" style="background:var(--sf-blue-light);border:1px solid #B4D6F0;flex:1;padding:16px 18px;border-radius:6px;">
           <div class="callout-value" style="color:var(--sf-blue)">8,300</div>
           <div class="callout-label" style="color:var(--sf-blue-dark)">Cases Analyzed</div>
-          <div class="callout-desc" style="color:var(--sf-blue-dark)">Closed opportunities (won + lost) analyzed for stage sequence conformance against the defined process model.</div>
+          <div class="callout-desc" style="color:var(--sf-blue-dark)">All opportunities with stage history (closed + open) analyzed for sequence conformance against the defined process model.</div>
         </div>
       </div>
     </div>
@@ -864,6 +865,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 
 <div class="severity-bar" id="severity-bar"></div>
 
+<div style="max-width:1600px;margin:0 auto;padding:0 32px 8px">
+  <div style="padding:12px 16px;background:#FFF9E6;border:1px solid #E8D48B;border-radius:6px;font-size:12px;color:#7A6C1E">
+    <strong>Cluster Quality Note:</strong> Global silhouette score is 0.028 (KMeans) / 0.09 (BERTopic), indicating weak cluster separation. Findings should be treated as exploratory signals, not confirmed patterns. See Pipeline Transparency for methodology details.
+  </div>
+</div>
+
 <div class="filters">
   <select class="filter-select" id="filter-type">
     <option value="">All Types</option>
@@ -909,8 +916,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
   <div style="border:1px solid #B4D6F0;border-radius:var(--radius);background:var(--sf-blue-light);padding:20px 24px;display:flex;align-items:center;gap:16px">
     <div style="width:40px;height:40px;background:linear-gradient(135deg,#0176D3,#49B6FF);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;flex-shrink:0">SF</div>
     <div style="flex:1">
-      <div style="font-size:14px;font-weight:700;color:var(--sf-blue-dark)">Connect Your Own Salesforce Org</div>
-      <div style="font-size:12px;color:var(--sf-blue-dark);opacity:0.7;margin-top:2px">Export your org's Slack data, case comments, or approval histories as CSV — drop them into the pattern engine and get your own forensics report. Works with any CRM data that has text fields and timestamps.</div>
+      <div style="font-size:14px;font-weight:700;color:var(--sf-blue-dark)">View Analysis Code on GitHub</div>
+      <div style="font-size:12px;color:var(--sf-blue-dark);opacity:0.7;margin-top:2px">This is an analysis tool, not a hosted service. Clone the repo to run the pattern engine on your own Slack exports, case comments, or CRM data with text fields and timestamps.</div>
     </div>
     <a href="https://github.com/chrbailey/transaction-forensics" target="_blank" style="padding:8px 16px;background:var(--sf-blue);color:white;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap">View on GitHub →</a>
   </div>

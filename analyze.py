@@ -548,7 +548,7 @@ def build_cards(documents: list[dict], clustering: dict, stability: dict,
 
         # Confidence = stability * silhouette quality
         stability_mean = stab.get("mean", 0.5)
-        confidence_score = round(stability_mean * 0.6 + min(max(cluster_sil + 0.5, 0), 1) * 0.4, 2)
+        confidence_score = round(stability_mean * 0.6 + min(max(cluster_sil, 0), 1) * 0.4, 2)
         confidence_score = min(confidence_score, 0.95)
         confidence = "HIGH" if confidence_score >= 0.7 else "MEDIUM" if confidence_score >= 0.5 else "LOW"
 

@@ -82,6 +82,8 @@ def build_communication_graph(documents: List[Dict]) -> Dict:
             connected.update((p1, p2))
 
     return {
+        "n_nodes": G.number_of_nodes(),
+        "n_edges": G.number_of_edges(),
         "degree_centrality": degree_cent,
         "betweenness_centrality": betweenness_cent,
         "communities": communities,
@@ -99,6 +101,7 @@ def _empty_result(elapsed: float, users: Optional[Set[str]] = None) -> Dict:
     u = users or set()
     cent = {x: 0.0 for x in u}
     return {
+        "n_nodes": len(u), "n_edges": 0,
         "degree_centrality": dict(cent), "betweenness_centrality": dict(cent),
         "communities": [set(u)] if u else [], "n_communities": 1 if u else 0,
         "bridge_users": [], "isolated_products": [], "product_overlap_matrix": {},

@@ -1,6 +1,6 @@
 # Transaction Forensics
 
-**Enterprise communication pattern analysis using NLP clustering on Salesforce data.**
+**Enterprise process analysis with two lenses: CRM pipeline forensics (conformance checking) and NLP communication pattern clustering.**
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://transaction-forensics.vercel.app)
 [![Data Source](https://img.shields.io/badge/data-Salesforce%2FHERB-blue)](https://huggingface.co/datasets/Salesforce/HERB)
@@ -14,50 +14,36 @@
 
 ## What It Does
 
-Drop enterprise communication data (Slack exports, meeting transcripts, documents, pull requests) into the pattern engine. It surfaces organizational anti-patterns that human reviewers would miss:
+Two analysis tabs in a single viewer:
 
-- **Compliance risks** — customer PII in public channels, unresolved privacy concerns
-- **Approval bottlenecks** — informal LGTM culture bypassing formal review workflows
-- **Knowledge silos** — teams solving the same problems independently
-- **Customer concentration** — revenue risk from account overlap across products
-- **Communication gaps** — timezone bottlenecks, fragmented feedback loops
+- **CRM Pipeline Forensics** — Conformance checking of 8,800 Kaggle CRM sales opportunities against an aspirational 8-stage pipeline model. Detects stage skips, reversals, quarter-end compression, velocity anomalies, and account concentration.
+- **NLP Communication Patterns** — TF-IDF + KMeans clustering on 37,064 enterprise communications from Salesforce's HERB dataset. Surfaces compliance risks, approval bottlenecks, knowledge silos, and communication gaps.
 
 ## Live Demo
 
-**→ [transaction-forensics.vercel.app](https://transaction-forensics.vercel.app)**
+**[transaction-forensics.vercel.app](https://transaction-forensics.vercel.app)**
 
-The demo analyzes Salesforce's own [HERB dataset](https://huggingface.co/datasets/Salesforce/HERB) — 37,064 enterprise communications across 30 product teams.
+Both tabs are live. CRM tab uses Kaggle CRM Sales Opportunities data; NLP tab uses Salesforce/HERB.
 
-## How It Works
+## Pipeline (v3.0)
 
-```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│   INGEST    │───▶│  NORMALIZE  │───▶│  VECTORIZE  │───▶│   CLUSTER   │───▶│   REPORT    │
-│             │    │             │    │             │    │             │    │             │
-│ Slack msgs  │    │ Clean text  │    │ TF-IDF      │    │ KMeans      │    │ Pattern     │
-│ Transcripts │    │ Expand abbr │    │ 5,000 feat  │    │ Silhouette  │    │ cards JSON  │
-│ Documents   │    │ Strip URLs  │    │ 1-3 ngrams  │    │ optimization│    │ + viewer    │
-│ Pull reqs   │    │ Lowercase   │    │ Stop words  │    │ Auto k      │    │             │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
-     0.2s               inline              ──── 17.7s ────                      0.02s
-```
+9 stages, ~109 seconds total (no GPU required):
 
-### Pipeline Details
+| # | Stage | Method | Details |
+|---|-------|--------|---------|
+| 1 | Ingest | File parsing | 37,064 docs from 30 products (Slack, transcripts, docs, PRs) |
+| 2 | Normalize | Text cleaning | 31 abbreviation expansions, URL stripping, Slack link unwrapping |
+| 3 | BERTopic | SBERT + HDBSCAN | Sentence-transformer embeddings, topic modeling (silhouette: 0.09) |
+| 4 | KMeans | TF-IDF + KMeans | 5,000 features, (1,3) n-grams, silhouette-optimized k (silhouette: 0.028) |
+| 5 | Network | Communication graph | NetworkX, Louvain communities, centrality analysis, bridge users |
+| 6 | Temporal | Change-point detection | Activity windows, volume spikes, temporal clustering |
+| 7 | Stability | Bootstrap (50 runs) | Cluster stability via resampled KMeans, pruning unstable clusters |
+| 8 | Build cards | Evidence metrics | Severity classification, confidence scoring, pattern typing |
+| 9 | Report | JSON + HTML | Pattern cards with provenance, deployed as static viewer |
 
-| Stage | Method | Details |
-|-------|--------|---------|
-| **Ingest** | File parsing | 37,064 docs from 30 products (32,781 Slack, 321 transcripts, 400 docs, 3,562 PRs) |
-| **Normalize** | Text cleaning | 31 enterprise abbreviation expansions (SFDC, SOQL, CPQ, MQL, etc.), URL stripping, Slack link unwrapping |
-| **Vectorize** | TF-IDF | scikit-learn `TfidfVectorizer`, 5,000 max features, (1,3) n-gram range, English stop words, min_df=2, max_df=0.95 |
-| **Cluster** | KMeans | Optimal k via silhouette score sweep (k=8..20), n_init=10, max_iter=300, random_state=42 |
-| **Correlate** | Statistical | Severity classification via keyword rules, confidence scoring by cluster cohesion, source cross-referencing |
-| **Report** | JSON + HTML | Pattern cards with provenance metadata, deployed as static viewer |
-
-**Total pipeline time: ~18 seconds** on 37K documents (no GPU required).
+**Cluster quality caveat:** Global silhouette scores are low (0.028 KMeans / 0.09 BERTopic), indicating weak cluster separation. Findings should be treated as exploratory signals, not confirmed patterns. The Pipeline Transparency section in the viewer documents all parameters.
 
 ## Quick Start
-
-### Run the Analysis
 
 ```bash
 # Clone
@@ -65,47 +51,35 @@ git clone https://github.com/chrbailey/transaction-forensics.git
 cd transaction-forensics
 
 # Install dependencies
-pip install scikit-learn pandas numpy datasets
+pip install scikit-learn pandas numpy datasets sentence-transformers hdbscan networkx
 
 # Download HERB dataset (one-time, ~200MB)
 python -c "from datasets import load_dataset; load_dataset('Salesforce/HERB')"
 
-# Run the pattern engine
-python analyze.py
+# Run the full pipeline (~109 seconds)
+python3.11 analyze.py
 
 # Open results
 open public/index.html
 ```
 
-### Use Your Own Data
-
-The engine works with any enterprise communication data. Export from:
-
-- **Salesforce** — Case comments, Chatter posts, Activity history
-- **Slack** — Channel exports (JSON format)
-- **Jira/Confluence** — Issue descriptions, page content
-- **Any CRM** — CSV with text fields and timestamps
-
-Modify the `ingest_herb()` function in `analyze.py` to point at your data source. The clustering pipeline is data-agnostic — it operates on any collection of text documents.
-
 ## Architecture
 
 ```
 transaction-forensics/
-├── analyze.py              # Pattern engine (Python + scikit-learn)
-│   ├── ingest_herb()       # Stage 1: Load HERB dataset
-│   ├── normalize_text()    # Stage 2: Text cleaning + abbreviation expansion
-│   ├── cluster_documents() # Stage 3: TF-IDF + KMeans with silhouette optimization
-│   ├── correlate_clusters()# Stage 4: Pattern classification + evidence extraction
-│   └── generate_report()   # Stage 5: JSON output with pipeline provenance
+├── analyze.py              # Main pipeline (9 stages)
+├── bertopic_cluster.py     # BERTopic clustering module
+├── network_analysis.py     # Communication graph + communities
+├── temporal_analysis.py    # Change-point detection
 ├── public/
-│   ├── index.html          # Interactive viewer (vanilla HTML/CSS/JS)
-│   └── pattern_cards.json  # Analysis output (generated by analyze.py)
+│   ├── index.html          # Two-tab viewer (CRM + NLP)
+│   └── pattern_cards.json  # NLP analysis output (generated)
 └── README.md
 ```
 
 ### Viewer Features
 
+- **Two analysis tabs** — CRM Pipeline Forensics + NLP Communication Patterns
 - **Severity filtering** — Critical / High / Medium / Low
 - **Type filtering** — Compliance, Bottleneck, Communication, Approval, Anomaly, Escalation
 - **Free-text search** — Across titles, descriptions, phrases, products, teams
@@ -114,38 +88,54 @@ transaction-forensics/
 - **Export** — Download findings as JSON
 - **Zero dependencies** — No framework, no build step, works offline
 
-## Data Source
+## Sample Findings
 
-This demo uses [Salesforce/HERB](https://huggingface.co/datasets/Salesforce/HERB) (Heterogeneous Enterprise Reasoning Benchmark), published by Salesforce Research under CC-BY-NC-4.0.
+### CRM Tab (Kaggle Data)
 
-HERB simulates a realistic enterprise environment with:
-- 30 product teams (ActionGenie, AnomalyForce, SecurityForce, etc.)
-- 120 customers across named companies (BlueWave, TechCorp, CloudSync)
-- 18 Salesforce team members with org hierarchy (VPs, leads, ICs)
-- Slack channels, meeting transcripts, product documents, pull requests
+| Finding | Value |
+|---------|-------|
+| Opportunities analyzed | 8,800 (closed + open) |
+| Win rate | 47.2% of closed deals |
+| Avg fitness score | 0.05 (against aspirational 8-stage model) |
+| Quarter-end concentration | Varies by dataset period |
+| Top account concentration (CR5) | Top 5 accounts drive majority of won revenue |
+
+### NLP Tab (HERB Data)
+
+| Severity | Pattern | Documents |
+|----------|---------|-----------|
+| Critical | Customer data references in public Slack channels | ~12K |
+| High | API/integration work siloed across product teams | ~4K |
+| Medium | Pull request discussions outside review tools | ~3.5K |
+| Medium | Informal approval patterns (LGTM culture) | ~590 |
+| Low | Positive sentiment baseline for morale tracking | ~2.2K |
+
+**Note:** NLP cluster confidence scores reflect actual silhouette quality. Low silhouette means these are directional signals, not high-confidence classifications.
+
+## Data Sources
+
+- **CRM tab:** [Kaggle CRM Sales Opportunities](https://www.kaggle.com/datasets/innocentmfa/crm-sales-opportunities) (Apache 2.0 license) — 8,800 opportunities, 85 accounts
+- **NLP tab:** [Salesforce/HERB](https://huggingface.co/datasets/Salesforce/HERB) (CC-BY-NC-4.0) — 37,064 enterprise communications across 30 product teams, 120 customers, 18 team members. Note: HERB contains synthetic timestamps extending to 2027.
+
+## Related
+
+The CRM conformance engine, data adapters (SAP RFC, OData, SFDC, CSV, and more), and cross-system correlation logic live in the companion repo: [SAP-Transaction-Forensics](https://github.com/chrbailey/SAP-Transaction-Forensics).
 
 ## Technology Stack
 
 | Component | Technology |
 |-----------|-----------|
 | Analysis | Python 3.11, scikit-learn, pandas, numpy |
-| NLP | TF-IDF vectorization with n-gram extraction |
-| Clustering | KMeans with silhouette score optimization |
+| NLP | TF-IDF vectorization, BERTopic (sentence-transformers + HDBSCAN) |
+| Network | NetworkX, Louvain community detection |
+| Clustering | KMeans + BERTopic with silhouette optimization |
 | Frontend | Vanilla HTML/CSS/JS (zero dependencies) |
 | Deployment | Vercel (static) |
-| Data | HuggingFace Datasets |
+| Data | HuggingFace Datasets, Kaggle |
 
-## Sample Findings
+## AI Authorship
 
-From the HERB dataset analysis:
-
-| Severity | Pattern | Documents |
-|----------|---------|-----------|
-| 🔴 Critical | Customer data references in open Slack channels | 12,194 |
-| 🟠 High | API/integration work siloed across product teams | 4,044 |
-| 🟡 Medium | Pull request discussions outside review tools | 3,510 |
-| 🟡 Medium | Informal approval patterns (LGTM culture) | 590 |
-| 🟢 Low | Positive sentiment baseline for morale tracking | 2,201 |
+This project was built with Claude Code (Anthropic). All commits are co-authored as reflected in git history. The architecture, design decisions, and analysis methodology are the author's; the implementation was pair-programmed with AI assistance.
 
 ## Author
 
