@@ -125,7 +125,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 .win-rate-bar { display: inline-flex; align-items: center; gap: 8px; }
 .win-rate-fill { height: 6px; background: var(--low); border-radius: 3px; }
 .win-rate-text { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--low); }
-.account-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+.account-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); position: relative; }
 .account-row:last-child { border-bottom: none; }
 .account-name { font-size: 14px; font-weight: 600; }
 .account-rev { font-size: 13px; font-family: var(--mono); color: var(--sf-blue); font-weight: 700; }
@@ -262,6 +262,34 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
   .pipeline-flow { gap: 4px; }
   .stage-box { font-size: 11px; padding: 6px 10px; }
 }
+
+/* ─── Hover Tooltips ─── */
+[data-tooltip] { position: relative; cursor: pointer; }
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+  background: #032D60; color: white; padding: 4px 10px; border-radius: 4px;
+  font-size: 11px; font-family: 'IBM Plex Mono', monospace; white-space: nowrap;
+  z-index: 10; pointer-events: none; margin-bottom: 6px;
+}
+[data-tooltip]:hover::before {
+  content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: #032D60;
+  z-index: 10; pointer-events: none;
+}
+
+/* ─── Agent Table Expand ─── */
+.data-table tbody tr.agent-row { cursor: pointer; }
+.data-table tbody tr.agent-row:hover { background: var(--sf-blue-light); }
+.agent-detail td { background: var(--bg); font-size: 12px; color: var(--text-secondary); padding: 8px 12px 12px 44px; font-style: italic; border-bottom: 1px solid var(--border-light); }
+
+/* ─── Stage Pill Interaction ─── */
+.stage-pill { cursor: pointer; transition: all 0.15s; }
+.stage-pill:hover { box-shadow: 0 0 0 2px var(--sf-blue); transform: translateY(-1px); }
+.stage-pill.stage-selected { box-shadow: 0 0 0 3px var(--sf-blue), 0 4px 12px rgba(1,118,211,0.3); background: var(--sf-blue) !important; color: white !important; border-color: var(--sf-blue) !important; }
+.stage-pill.stage-selected.stage-won-pill { background: var(--low) !important; box-shadow: 0 0 0 3px var(--low), 0 4px 12px rgba(46,132,74,0.3); }
+#stage-detail { margin-top: 12px; font-size: 13px; font-family: 'IBM Plex Mono', monospace; color: var(--sf-blue-dark); background: var(--sf-blue-light); border: 1px solid #B4D6F0; border-radius: 6px; padding: 10px 14px; display: none; }
+#stage-detail.visible { display: block; }
 </style>
 </head>
 <body>
@@ -291,7 +319,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
         <div class="header-stat"><div class="header-stat-value" id="stat-source">—</div><div class="header-stat-label">Data Source</div></div>
         <div class="header-stat"><div class="header-stat-value" id="stat-messages">—</div><div class="header-stat-label">Messages Scanned</div></div>
         <div class="header-stat"><div class="header-stat-value" id="stat-products">—</div><div class="header-stat-label">Products Analyzed</div></div>
-        <div class="header-stat" style="font-size:11px;color:#7A6C1E;max-width:220px;line-height:1.3"><em>Note: HERB dataset contains synthetic timestamps extending to 2027. Temporal patterns reflect relative timing, not calendar dates.</em></div>
         <button class="header-export" id="btn-export">Export JSON ↓</button>
       </div>
     </div>
@@ -340,41 +367,42 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       <div class="panel-subtitle">Expected stage sequence for opportunity progression</div>
       <div class="pipeline-flow">
         <div class="pipeline-stage">
-          <div class="stage-box">Prospecting</div>
+          <div class="stage-box stage-pill" onclick="selectStage(this, 'Prospecting', 500)">Prospecting</div>
           <span class="stage-arrow">→</span>
         </div>
         <div class="pipeline-stage">
-          <div class="stage-box">Qualification</div>
+          <div class="stage-box stage-pill" onclick="selectStage(this, 'Qualification', 1589)">Qualification</div>
           <span class="stage-arrow">→</span>
         </div>
         <div class="pipeline-stage">
-          <div class="stage-box">Needs Analysis</div>
+          <div class="stage-box stage-pill" onclick="selectStage(this, 'Needs Analysis', 0)">Needs Analysis</div>
           <span class="stage-arrow">→</span>
         </div>
         <div class="pipeline-stage">
-          <div class="stage-box">Value Proposition</div>
+          <div class="stage-box stage-pill" onclick="selectStage(this, 'Value Proposition', 0)">Value Proposition</div>
           <span class="stage-arrow">→</span>
         </div>
         <div class="pipeline-stage">
-          <div class="stage-box">Id. Decision Makers</div>
+          <div class="stage-box stage-pill" onclick="selectStage(this, 'Id. Decision Makers', 0)">Id. Decision Makers</div>
           <span class="stage-arrow">→</span>
         </div>
         <div class="pipeline-stage">
-          <div class="stage-box">Perception Analysis</div>
+          <div class="stage-box stage-pill" onclick="selectStage(this, 'Perception Analysis', 0)">Perception Analysis</div>
           <span class="stage-arrow">→</span>
         </div>
         <div class="pipeline-stage">
-          <div class="stage-box">Proposal / Price Quote</div>
+          <div class="stage-box stage-pill" onclick="selectStage(this, 'Proposal / Price Quote', 0)">Proposal / Price Quote</div>
           <span class="stage-arrow">→</span>
         </div>
         <div class="pipeline-stage">
-          <div class="stage-box">Negotiation / Review</div>
+          <div class="stage-box stage-pill" onclick="selectStage(this, 'Negotiation / Review', 0)">Negotiation / Review</div>
           <span class="stage-arrow">→</span>
         </div>
         <div class="pipeline-stage">
-          <div class="stage-box stage-won">Closed Won</div>
+          <div class="stage-box stage-won stage-pill stage-won-pill" onclick="selectStage(this, 'Closed Won', 4238)">Closed Won</div>
         </div>
       </div>
+      <div id="stage-detail"></div>
       <div class="conformance-callout">
         <div class="callout-box" style="background:#FFF9E6;border:1px solid #E8D48B">
           <div class="callout-value" style="color:var(--medium)">0.05</div>
@@ -402,62 +430,62 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       <div class="panel-title">Quarter-End Compression</div>
       <div class="panel-subtitle">Monthly close distribution — QE months highlighted in orange</div>
       <div class="chart-area">
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="Jan: 0 (0.0%)">
           <div class="bar-row-label">Jan</div>
           <div class="bar-track"><div class="bar-fill regular" style="width:0%">—</div></div>
           <div class="bar-value">0</div>
         </div>
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="Feb: 0 (0.0%)">
           <div class="bar-row-label">Feb</div>
           <div class="bar-track"><div class="bar-fill regular" style="width:0%">—</div></div>
           <div class="bar-value">0</div>
         </div>
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="Mar: 647 (9.6%) — QE month">
           <div class="bar-row-label" style="font-weight:700;color:var(--high)">Mar</div>
           <div class="bar-track"><div class="bar-fill qe" style="width:80.4%">647</div></div>
           <div class="bar-value">647</div>
         </div>
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="Apr: 586 (8.7%)">
           <div class="bar-row-label">Apr</div>
           <div class="bar-track"><div class="bar-fill regular" style="width:72.8%">586</div></div>
           <div class="bar-value">586</div>
         </div>
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="May: 805 (12.0%) — peak month">
           <div class="bar-row-label">May</div>
           <div class="bar-track"><div class="bar-fill regular" style="width:100%">805</div></div>
           <div class="bar-value">805</div>
         </div>
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="Jun: 641 (9.6%) — QE month">
           <div class="bar-row-label" style="font-weight:700;color:var(--high)">Jun</div>
           <div class="bar-track"><div class="bar-fill qe" style="width:79.6%">641</div></div>
           <div class="bar-value">641</div>
         </div>
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="Jul: 627 (9.3%)">
           <div class="bar-row-label">Jul</div>
           <div class="bar-track"><div class="bar-fill regular" style="width:77.9%">627</div></div>
           <div class="bar-value">627</div>
         </div>
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="Aug: 785 (11.7%)">
           <div class="bar-row-label">Aug</div>
           <div class="bar-track"><div class="bar-fill regular" style="width:97.5%">785</div></div>
           <div class="bar-value">785</div>
         </div>
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="Sep: 635 (9.5%) — QE month">
           <div class="bar-row-label" style="font-weight:700;color:var(--high)">Sep</div>
           <div class="bar-track"><div class="bar-fill qe" style="width:78.9%">635</div></div>
           <div class="bar-value">635</div>
         </div>
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="Oct: 566 (8.4%)">
           <div class="bar-row-label">Oct</div>
           <div class="bar-track"><div class="bar-fill regular" style="width:70.3%">566</div></div>
           <div class="bar-value">566</div>
         </div>
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="Nov: 768 (11.4%)">
           <div class="bar-row-label">Nov</div>
           <div class="bar-track"><div class="bar-fill regular" style="width:95.4%">768</div></div>
           <div class="bar-value">768</div>
         </div>
-        <div class="bar-row">
+        <div class="bar-row" data-tooltip="Dec: 651 (9.7%) — QE month">
           <div class="bar-row-label" style="font-weight:700;color:var(--high)">Dec</div>
           <div class="bar-track"><div class="bar-fill qe" style="width:80.9%">651</div></div>
           <div class="bar-value">651</div>
@@ -472,22 +500,22 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       <div class="panel-title">Deal Velocity Distribution</div>
       <div class="panel-subtitle">Time-to-close buckets — closed won opportunities only</div>
       <div style="margin-top:8px;">
-        <div class="velocity-row">
+        <div class="velocity-row" data-tooltip="0–30 days: 1,817 deals (42.9%) — fast transactional">
           <div class="velocity-label">0–30 days</div>
           <div class="velocity-track"><div class="velocity-fill" style="width:100%">1,817</div></div>
           <div class="velocity-pct">42.9%</div>
         </div>
-        <div class="velocity-row">
+        <div class="velocity-row" data-tooltip="31–60 days: 377 deals (8.9%)">
           <div class="velocity-label">31–60 days</div>
           <div class="velocity-track"><div class="velocity-fill" style="width:20.7%">377</div></div>
           <div class="velocity-pct">8.9%</div>
         </div>
-        <div class="velocity-row">
+        <div class="velocity-row" data-tooltip="61–90 days: 1,078 deals (25.4%)">
           <div class="velocity-label">61–90 days</div>
           <div class="velocity-track"><div class="velocity-fill" style="width:59.3%">1,078</div></div>
           <div class="velocity-pct">25.4%</div>
         </div>
-        <div class="velocity-row">
+        <div class="velocity-row" data-tooltip="91–180 days: 966 deals (22.8%) — enterprise negotiations">
           <div class="velocity-label">91–180 days</div>
           <div class="velocity-track"><div class="velocity-fill" style="width:53.2%">966</div></div>
           <div class="velocity-pct">22.8%</div>
@@ -530,76 +558,86 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr class="agent-row" onclick="toggleAgentDetail(this)">
             <td><span class="rank-badge">1</span>Hayden Neloms</td>
             <td class="num"><span class="win-rate-bar"><span class="win-rate-text">70.4%</span><span class="win-rate-fill" style="width:38px;display:inline-block;"></span></span></td>
             <td class="num">107</td>
             <td class="num">152</td>
             <td class="num">$272K</td>
           </tr>
-          <tr>
+          <tr class="agent-detail" style="display:none"><td colspan="5">avg deal size $2,542 · deals/month: ~8.9 · win rate 5.4 pts above team avg</td></tr>
+          <tr class="agent-row" onclick="toggleAgentDetail(this)">
             <td><span class="rank-badge">2</span>Maureen Marcano</td>
             <td class="num"><span class="win-rate-bar"><span class="win-rate-text">70.0%</span></span></td>
             <td class="num">149</td>
             <td class="num">213</td>
             <td class="num">$350K</td>
           </tr>
-          <tr>
+          <tr class="agent-detail" style="display:none"><td colspan="5">avg deal size $2,349 · deals/month: ~12.4 · win rate 5.0 pts above team avg</td></tr>
+          <tr class="agent-row" onclick="toggleAgentDetail(this)">
             <td><span class="rank-badge">3</span>Wilburn Farren</td>
             <td class="num"><span class="win-rate-bar"><span class="win-rate-text">69.6%</span></span></td>
             <td class="num">55</td>
             <td class="num">79</td>
             <td class="num">$158K</td>
           </tr>
-          <tr>
+          <tr class="agent-detail" style="display:none"><td colspan="5">avg deal size $2,873 · deals/month: ~4.6 · win rate 4.6 pts above team avg</td></tr>
+          <tr class="agent-row" onclick="toggleAgentDetail(this)">
             <td><span class="rank-badge">4</span>Cecily Lampkin</td>
             <td class="num"><span class="win-rate-bar"><span class="win-rate-text">66.9%</span></span></td>
             <td class="num">107</td>
             <td class="num">160</td>
             <td class="num">$230K</td>
           </tr>
-          <tr>
+          <tr class="agent-detail" style="display:none"><td colspan="5">avg deal size $2,150 · deals/month: ~9.4 · win rate 1.9 pts above team avg</td></tr>
+          <tr class="agent-row" onclick="toggleAgentDetail(this)">
             <td><span class="rank-badge">5</span>Versie Hillebrand</td>
             <td class="num"><span class="win-rate-bar"><span class="win-rate-text">66.7%</span></span></td>
             <td class="num">176</td>
             <td class="num">264</td>
             <td class="num">$188K</td>
           </tr>
-          <tr>
+          <tr class="agent-detail" style="display:none"><td colspan="5">avg deal size $1,068 · deals/month: ~15.5 · high volume, lower avg deal</td></tr>
+          <tr class="agent-row" onclick="toggleAgentDetail(this)">
             <td><span class="rank-badge">6</span>Moses Frase</td>
             <td class="num"><span class="win-rate-bar"><span class="win-rate-text">66.2%</span></span></td>
             <td class="num">129</td>
             <td class="num">195</td>
             <td class="num">$207K</td>
           </tr>
-          <tr>
+          <tr class="agent-detail" style="display:none"><td colspan="5">avg deal size $1,605 · deals/month: ~11.5 · win rate 1.2 pts above team avg</td></tr>
+          <tr class="agent-row" onclick="toggleAgentDetail(this)">
             <td><span class="rank-badge">7</span>Boris Faz</td>
             <td class="num"><span class="win-rate-bar"><span class="win-rate-text">66.0%</span></span></td>
             <td class="num">101</td>
             <td class="num">153</td>
             <td class="num">$262K</td>
           </tr>
-          <tr>
+          <tr class="agent-detail" style="display:none"><td colspan="5">avg deal size $2,594 · deals/month: ~9.0 · win rate 1.0 pts above team avg</td></tr>
+          <tr class="agent-row" onclick="toggleAgentDetail(this)">
             <td><span class="rank-badge">8</span>James Ascencio</td>
             <td class="num"><span class="win-rate-bar"><span class="win-rate-text">65.5%</span></span></td>
             <td class="num">135</td>
             <td class="num">206</td>
             <td class="num">$414K</td>
           </tr>
-          <tr>
+          <tr class="agent-detail" style="display:none"><td colspan="5">avg deal size $3,067 · deals/month: ~12.1 · highest avg deal in top 10</td></tr>
+          <tr class="agent-row" onclick="toggleAgentDetail(this)">
             <td><span class="rank-badge">9</span>Corliss Cosme</td>
             <td class="num"><span class="win-rate-bar"><span class="win-rate-text">65.5%</span></span></td>
             <td class="num">150</td>
             <td class="num">229</td>
             <td class="num">$421K</td>
           </tr>
-          <tr>
+          <tr class="agent-detail" style="display:none"><td colspan="5">avg deal size $2,807 · deals/month: ~13.5 · strong volume + high deal size</td></tr>
+          <tr class="agent-row" onclick="toggleAgentDetail(this)">
             <td><span class="rank-badge" style="background:var(--medium-bg);color:var(--medium);">10</span>Reed Clapper</td>
             <td class="num"><span class="win-rate-bar"><span class="win-rate-text">65.4%</span></span></td>
             <td class="num">155</td>
             <td class="num">237</td>
             <td class="num">$438K</td>
           </tr>
+          <tr class="agent-detail" style="display:none"><td colspan="5">avg deal size $2,826 · deals/month: ~13.9 · top revenue generator in the table</td></tr>
         </tbody>
       </table>
     </div>
@@ -608,37 +646,37 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       <div class="panel-title">Product Revenue Mix</div>
       <div class="panel-subtitle">Closed-won revenue by product — total $10,005K</div>
       <div style="margin-top:8px;">
-        <div class="hbar-row">
+        <div class="hbar-row" data-tooltip="GTXPro: $3,510K (35.1%) — 729 deals won">
           <div class="hbar-label">GTXPro</div>
           <div class="hbar-track"><div class="hbar-fill" style="width:100%">$3,510K</div></div>
           <div class="hbar-val">35.1%</div>
         </div>
-        <div class="hbar-row">
+        <div class="hbar-row" data-tooltip="GTX Plus Pro: $2,630K (26.3%) — 479 deals won">
           <div class="hbar-label">GTX Plus Pro</div>
           <div class="hbar-track"><div class="hbar-fill" style="width:74.9%">$2,630K</div></div>
           <div class="hbar-val">26.3%</div>
         </div>
-        <div class="hbar-row">
+        <div class="hbar-row" data-tooltip="MG Advanced: $2,216K (22.2%) — 654 deals won">
           <div class="hbar-label">MG Advanced</div>
           <div class="hbar-track"><div class="hbar-fill" style="width:63.1%">$2,216K</div></div>
           <div class="hbar-val">22.2%</div>
         </div>
-        <div class="hbar-row">
+        <div class="hbar-row" data-tooltip="GTX Plus Basic: $705K (7.1%) — 653 deals won">
           <div class="hbar-label">GTX Plus Basic</div>
           <div class="hbar-track"><div class="hbar-fill" style="width:20.1%">$705K</div></div>
           <div class="hbar-val">7.1%</div>
         </div>
-        <div class="hbar-row">
+        <div class="hbar-row" data-tooltip="GTX Basic: $499K (5.0%) — 915 deals won">
           <div class="hbar-label">GTX Basic</div>
           <div class="hbar-track"><div class="hbar-fill" style="width:14.2%">$499K</div></div>
           <div class="hbar-val">5.0%</div>
         </div>
-        <div class="hbar-row">
+        <div class="hbar-row" data-tooltip="GTK 500: $401K (4.0%) — 15 deals won">
           <div class="hbar-label">GTK 500</div>
           <div class="hbar-track"><div class="hbar-fill" style="width:11.4%">$401K</div></div>
           <div class="hbar-val">4.0%</div>
         </div>
-        <div class="hbar-row">
+        <div class="hbar-row" data-tooltip="MG Special: $44K (0.4%) — 793 deals won">
           <div class="hbar-label">MG Special</div>
           <div class="hbar-track"><div class="hbar-fill" style="width:1.3%"></div></div>
           <div class="hbar-val">0.4%</div>
@@ -660,27 +698,27 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
         <div class="panel-title">Top Accounts by Revenue</div>
         <div class="panel-subtitle">Closed-won revenue across 85 accounts</div>
         <div style="margin-top:8px;">
-          <div class="account-row">
+          <div class="account-row" data-tooltip="Kan-code: $341K — 3.4% of total revenue">
             <div class="account-name">Kan-code</div>
             <div class="account-bar-wrap"><div class="account-bar" style="width:100%"></div></div>
             <div class="account-rev">$341K</div>
           </div>
-          <div class="account-row">
+          <div class="account-row" data-tooltip="Konex: $269K — 2.7% of total revenue">
             <div class="account-name">Konex</div>
             <div class="account-bar-wrap"><div class="account-bar" style="width:78.9%"></div></div>
             <div class="account-rev">$269K</div>
           </div>
-          <div class="account-row">
+          <div class="account-row" data-tooltip="Condax: $206K — 2.1% of total revenue">
             <div class="account-name">Condax</div>
             <div class="account-bar-wrap"><div class="account-bar" style="width:60.4%"></div></div>
             <div class="account-rev">$206K</div>
           </div>
-          <div class="account-row">
+          <div class="account-row" data-tooltip="Cheers: $198K — 2.0% of total revenue">
             <div class="account-name">Cheers</div>
             <div class="account-bar-wrap"><div class="account-bar" style="width:58.1%"></div></div>
             <div class="account-rev">$198K</div>
           </div>
-          <div class="account-row">
+          <div class="account-row" data-tooltip="Hottechi: $195K — 1.9% of total revenue">
             <div class="account-name">Hottechi</div>
             <div class="account-bar-wrap"><div class="account-bar" style="width:57.2%"></div></div>
             <div class="account-rev">$195K</div>
@@ -867,7 +905,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 
 <div style="max-width:1600px;margin:0 auto;padding:0 32px 8px">
   <div style="padding:12px 16px;background:#FFF9E6;border:1px solid #E8D48B;border-radius:6px;font-size:12px;color:#7A6C1E">
-    <strong>Cluster Quality Note:</strong> Global silhouette score is 0.028 (KMeans) / 0.09 (BERTopic), indicating weak cluster separation. Findings should be treated as exploratory signals, not confirmed patterns. See Pipeline Transparency for methodology details.
+    <strong>Cluster Quality Note:</strong> Global silhouette score is 0.028 (KMeans) / 0.09 (BERTopic), indicating weak cluster separation. Findings should be treated as exploratory signals, not confirmed patterns. See Pipeline Transparency for methodology details. <span style="opacity:0.7">HERB dataset timestamps extend to 2027 (synthetic); temporal patterns reflect relative timing.</span>
   </div>
 </div>
 
@@ -1307,6 +1345,35 @@ function renderPipeline() {
   });
   techDiv.appendChild(techDetails);
   container.appendChild(techDiv);
+}
+
+// ─── Agent Table Expand ───
+function toggleAgentDetail(row) {
+  var detail = row.nextElementSibling;
+  if (!detail || !detail.classList.contains('agent-detail')) return;
+  var isOpen = detail.style.display !== 'none';
+  detail.style.display = isOpen ? 'none' : 'table-row';
+  row.style.background = isOpen ? '' : 'var(--sf-blue-light)';
+}
+
+// ─── Stage Pipeline Click ───
+function selectStage(el, stageName, count) {
+  var pills = document.querySelectorAll('.stage-pill');
+  var isAlreadySelected = el.classList.contains('stage-selected');
+  pills.forEach(function(p) { p.classList.remove('stage-selected'); });
+  var detail = document.getElementById('stage-detail');
+  if (isAlreadySelected) {
+    detail.textContent = '';
+    detail.classList.remove('visible');
+    return;
+  }
+  el.classList.add('stage-selected');
+  if (count > 0) {
+    detail.textContent = count.toLocaleString() + ' opportunities in ' + stageName;
+  } else {
+    detail.textContent = stageName + ' — intermediate stage (data collapses to primary stages in source data)';
+  }
+  detail.classList.add('visible');
 }
 
 loadData();
