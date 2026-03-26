@@ -362,9 +362,106 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 
   <!-- Hero -->
   <div style="margin-bottom:40px">
-    <div style="font-size:32px;font-weight:800;line-height:1.2;margin-bottom:12px">Enterprise processes leave forensic trails.<br><span style="color:var(--sf-blue)">This tool reads them.</span></div>
+    <div style="font-size:32px;font-weight:800;line-height:1.2;margin-bottom:12px">Structured data tells you <em>what</em> happened.<br><span style="color:var(--sf-blue)">Unstructured text tells you <em>why</em>.</span></div>
     <div style="font-size:15px;color:var(--text-secondary);line-height:1.7;max-width:800px">
-      Transaction Forensics is an automated process mining engine that ingests event logs from ERP, CRM, and communication systems, then surfaces compliance violations, bottleneck patterns, and anomalies that manual audits miss. Built as a Stanford TECH 41 project — rapid prototyping of AI products.
+      Transaction Forensics is a process mining engine that combines ERP transaction logs with the unstructured text that surrounds them — emails, Slack messages, progress reports, call transcripts, and order notes — to surface the discrepancies between what organizations report and what actually happened. Built as a Stanford TECH 41 project.
+    </div>
+  </div>
+
+  <!-- The Thesis -->
+  <div class="section">
+    <div class="section-title">The Core Insight</div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow-sm);margin-bottom:8px">
+      <div style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:20px">
+        Every enterprise system generates two kinds of data. <strong>Structured transactions</strong> — timestamps, amounts, stage changes, user IDs — tell you the official story. <strong>Unstructured text</strong> — the emails, Slack threads, meeting notes, timesheets, SOWs, and progress reports that surround those transactions — tell you what actually happened. The gap between them is where fraud, waste, and dysfunction hide.
+      </div>
+
+      <!-- Before/After comparison -->
+      <div style="display:grid;grid-template-columns:1fr 48px 1fr;gap:0;margin-bottom:20px">
+
+        <!-- Structured Only -->
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px 0 0 8px;padding:20px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:14px">Structured Data Says</div>
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="padding:10px 14px;background:white;border-radius:6px;border:1px solid var(--border-light)">
+              <div style="font-size:11px;font-family:var(--mono);color:var(--text-muted)">CRM OPPORTUNITY</div>
+              <div style="font-size:13px;margin-top:4px">"Deal in Negotiation for 6 months"</div>
+            </div>
+            <div style="padding:10px 14px;background:white;border-radius:6px;border:1px solid var(--border-light)">
+              <div style="font-size:11px;font-family:var(--mono);color:var(--text-muted)">SAP P2P</div>
+              <div style="font-size:13px;margin-top:4px">"Purchase Order created 03/15"</div>
+            </div>
+            <div style="padding:10px 14px;background:white;border-radius:6px;border:1px solid var(--border-light)">
+              <div style="font-size:11px;font-family:var(--mono);color:var(--text-muted)">TIMESHEET</div>
+              <div style="font-size:13px;margin-top:4px">"40 hours billed to Project Alpha"</div>
+            </div>
+            <div style="padding:10px 14px;background:white;border-radius:6px;border:1px solid var(--border-light)">
+              <div style="font-size:11px;font-family:var(--mono);color:var(--text-muted)">PROJECT STATUS</div>
+              <div style="font-size:13px;margin-top:4px">"Phase 2: On Track, Green"</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VS divider -->
+        <div style="display:flex;align-items:center;justify-content:center;background:var(--sf-nav);color:white;font-size:11px;font-weight:800;letter-spacing:1px">vs</div>
+
+        <!-- Unstructured Reveals -->
+        <div style="background:var(--critical-bg);border:1px solid #E8A8A5;border-radius:0 8px 8px 0;padding:20px">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#8B1A15;margin-bottom:14px">Unstructured Text Reveals</div>
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="padding:10px 14px;background:white;border-radius:6px;border:1px solid #F0B4B4">
+              <div style="font-size:11px;font-family:var(--mono);color:var(--critical)">SLACK THREAD</div>
+              <div style="font-size:13px;margin-top:4px">"Customer said not ready — but Sales moved it forward anyway. No documented sign-off."</div>
+            </div>
+            <div style="padding:10px 14px;background:white;border-radius:6px;border:1px solid #F0B4B4">
+              <div style="font-size:11px;font-family:var(--mono);color:var(--critical)">EMAIL CHAIN</div>
+              <div style="font-size:13px;margin-top:4px">"Requisition wasn't approved yet. Create the PO now, we'll get the paperwork later."</div>
+            </div>
+            <div style="padding:10px 14px;background:white;border-radius:6px;border:1px solid #F0B4B4">
+              <div style="font-size:11px;font-family:var(--mono);color:var(--critical)">PROGRESS REPORT</div>
+              <div style="font-size:13px;margin-top:4px">"Assigned to Project Alpha but worked on Beta all week. SOW deliverables not started."</div>
+            </div>
+            <div style="padding:10px 14px;background:white;border-radius:6px;border:1px solid #F0B4B4">
+              <div style="font-size:11px;font-family:var(--mono);color:var(--critical)">MEETING TRANSCRIPT</div>
+              <div style="font-size:13px;margin-top:4px">"We're 3 weeks behind. Tell the client we're on track while we figure this out."</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Evidence from our analysis -->
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px">Evidence From Our Analysis</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+
+        <div style="padding:14px;background:var(--bg);border-radius:6px;border-left:3px solid var(--critical)">
+          <div style="font-size:12px;font-weight:700;margin-bottom:6px">SAP IDES: Retroactive Documentation</div>
+          <div style="font-size:11px;color:var(--text-secondary);line-height:1.6">Structured data shows PO and PR both exist. <strong>Timestamps reveal</strong> the PO was created before the PR — approval was documented after the fact. Only detectable by cross-referencing temporal sequence.</div>
+          <div style="margin-top:8px;font-size:10px;font-family:var(--mono);color:var(--critical);cursor:pointer" onclick="switchTab('ides')">See IDES Compliance tab &#8594;</div>
+        </div>
+
+        <div style="padding:14px;background:var(--bg);border-radius:6px;border-left:3px solid var(--high)">
+          <div style="font-size:12px;font-weight:700;margin-bottom:6px">HERB: Approvals in Slack, Not Systems</div>
+          <div style="font-size:11px;color:var(--text-secondary);line-height:1.6">37,064 enterprise messages analyzed. <strong>1,226 "LGTM/Approved" messages found in Slack channels</strong> — informal approvals with no audit trail. Structured approval workflows show no record of these decisions.</div>
+          <div style="margin-top:8px;font-size:10px;font-family:var(--mono);color:var(--high);cursor:pointer" onclick="switchTab('nlp')">See NLP Patterns tab &#8594;</div>
+        </div>
+
+        <div style="padding:14px;background:var(--bg);border-radius:6px;border-left:3px solid #9050E9">
+          <div style="font-size:12px;font-weight:700;margin-bottom:6px">BPI: 57K Payment Blocks — Why?</div>
+          <div style="font-size:11px;color:var(--text-secondary);line-height:1.6">Structured data shows 22.7% of POs hit payment blocks. <strong>The event log can't explain why</strong> — that answer lives in vendor correspondence, invoice discrepancy notes, and buyer emails that aren't in the event log.</div>
+          <div style="margin-top:8px;font-size:10px;font-family:var(--mono);color:#9050E9;cursor:pointer" onclick="switchTab('bpi')">See BPI Challenge tab &#8594;</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- The real-world statement -->
+    <div style="background:var(--sf-nav);border-radius:var(--radius);padding:24px 28px;color:white;box-shadow:var(--shadow-md)">
+      <div style="font-size:14px;line-height:1.8;opacity:0.9">
+        <strong style="opacity:1">20 years of ERP consulting taught me this:</strong> In every engagement where something went wrong — billing disputes, project failures, compliance gaps — the structured transaction data looked clean. The truth was always in the unstructured layer: the email where someone said "skip the approval," the timesheet that didn't match the progress report, the SOW deliverable that was marked complete but never started. This tool automates finding those discrepancies at scale.
+      </div>
     </div>
   </div>
 
