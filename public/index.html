@@ -304,14 +304,21 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       </div>
     </div>
     <div class="header-tabs">
-      <button class="tab-btn active" id="tab-btn-crm" onclick="switchTab('crm')">CRM Pipeline</button>
-      <button class="tab-btn" id="tab-btn-bpi" onclick="switchTab('bpi')">BPI Challenge 2019</button>
-      <button class="tab-btn" id="tab-btn-ides" onclick="switchTab('ides')">SAP IDES Compliance</button>
+      <button class="tab-btn active" id="tab-btn-home" onclick="switchTab('home')">Overview</button>
+      <button class="tab-btn" id="tab-btn-crm" onclick="switchTab('crm')">CRM Pipeline</button>
+      <button class="tab-btn" id="tab-btn-bpi" onclick="switchTab('bpi')">BPI Challenge</button>
+      <button class="tab-btn" id="tab-btn-ides" onclick="switchTab('ides')">IDES Compliance</button>
       <button class="tab-btn" id="tab-btn-nlp" onclick="switchTab('nlp')">NLP Patterns</button>
     </div>
     <div class="header-meta">
-      <!-- CRM stats (shown when CRM tab active) -->
-      <div id="meta-crm" style="display:flex;gap:24px;align-items:center;">
+      <!-- Home stats -->
+      <div id="meta-home" style="display:flex;gap:24px;align-items:center;">
+        <div class="header-stat"><div class="header-stat-value">834</div><div class="header-stat-label">Tests Passing</div></div>
+        <div class="header-stat"><div class="header-stat-value">7</div><div class="header-stat-label">Data Adapters</div></div>
+        <div class="header-stat"><div class="header-stat-value">4</div><div class="header-stat-label">Analysis Engines</div></div>
+      </div>
+      <!-- CRM stats -->
+      <div id="meta-crm" style="display:none;gap:24px;align-items:center;">
         <div class="header-stat"><div class="header-stat-value">8,800</div><div class="header-stat-label">Opportunities</div></div>
         <div class="header-stat"><div class="header-stat-value">85</div><div class="header-stat-label">Accounts</div></div>
         <div class="header-stat"><div class="header-stat-value">$10M</div><div class="header-stat-label">Revenue</div></div>
@@ -328,7 +335,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
         <div class="header-stat"><div class="header-stat-value" style="color:#FF6B6B">7</div><div class="header-stat-label">Violations Found</div></div>
         <div class="header-stat"><div class="header-stat-value">300</div><div class="header-stat-label">Process Variants</div></div>
       </div>
-      <!-- NLP stats (shown when NLP tab active) -->
+      <!-- NLP stats -->
       <div id="meta-nlp" style="display:none;gap:24px;align-items:center;">
         <div class="header-stat"><div class="header-stat-value" id="stat-source">—</div><div class="header-stat-label">Data Source</div></div>
         <div class="header-stat"><div class="header-stat-value" id="stat-messages">—</div><div class="header-stat-label">Messages Scanned</div></div>
@@ -348,9 +355,384 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 </div>
 
 <!-- ═══════════════════════════════════════════════
-     TAB 1: CRM Pipeline Forensics (DEFAULT)
+     TAB 0: Overview / Home (DEFAULT)
 ═══════════════════════════════════════════════ -->
-<div id="tab-crm" class="tab-panel active">
+<div id="tab-home" class="tab-panel active">
+<div class="page" style="max-width:1200px">
+
+  <!-- Hero -->
+  <div style="margin-bottom:40px">
+    <div style="font-size:32px;font-weight:800;line-height:1.2;margin-bottom:12px">Enterprise processes leave forensic trails.<br><span style="color:var(--sf-blue)">This tool reads them.</span></div>
+    <div style="font-size:15px;color:var(--text-secondary);line-height:1.7;max-width:800px">
+      Transaction Forensics is an automated process mining engine that ingests event logs from ERP, CRM, and communication systems, then surfaces compliance violations, bottleneck patterns, and anomalies that manual audits miss. Built as a Stanford TECH 41 project — rapid prototyping of AI products.
+    </div>
+  </div>
+
+  <!-- Architecture Diagram -->
+  <div class="section">
+    <div class="section-title">System Architecture</div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-sm);overflow-x:auto">
+
+      <!-- Pipeline flow -->
+      <div style="display:flex;align-items:flex-start;gap:12px;min-width:900px">
+
+        <!-- Data Sources -->
+        <div style="flex:0 0 180px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;text-align:center">Data Sources</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="padding:8px 12px;background:#EEF6F0;border:1px solid #C8E6C9;border-radius:6px;font-size:11px;font-weight:600;text-align:center">SAP ERP (IDES/ECC)</div>
+            <div style="padding:8px 12px;background:#E8F4FD;border:1px solid #B4D6F0;border-radius:6px;font-size:11px;font-weight:600;text-align:center">Salesforce CRM</div>
+            <div style="padding:8px 12px;background:#F3E8FF;border:1px solid #D4B4F0;border-radius:6px;font-size:11px;font-weight:600;text-align:center">BPI Challenge (XES)</div>
+            <div style="padding:8px 12px;background:#FFF4EC;border:1px solid #F0D4B4;border-radius:6px;font-size:11px;font-weight:600;text-align:center">Slack / HERB Comms</div>
+            <div style="padding:8px 12px;background:#FEF1EE;border:1px solid #F0B4B4;border-radius:6px;font-size:11px;font-weight:600;text-align:center">NetSuite ERP</div>
+            <div style="padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;font-size:11px;font-weight:600;text-align:center;color:var(--text-muted)">CSV / Custom</div>
+          </div>
+        </div>
+
+        <!-- Arrow -->
+        <div style="flex:0 0 40px;display:flex;align-items:center;justify-content:center;padding-top:60px">
+          <div style="font-size:24px;color:var(--text-muted)">&#8594;</div>
+        </div>
+
+        <!-- Adapters -->
+        <div style="flex:0 0 140px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;text-align:center">7 Adapters</div>
+          <div style="padding:16px;background:var(--bg);border:2px dashed var(--border);border-radius:8px">
+            <div style="font-size:11px;font-family:var(--mono);color:var(--text-secondary);line-height:1.8;text-align:center">
+              IDataAdapter<br>interface<br>
+              <span style="font-size:10px;color:var(--text-muted)">Normalize to<br>unified event log</span>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:10px;color:var(--text-muted);text-align:center;font-family:var(--mono)">BPI, CSV, ECC,<br>S4, SALT, SFDC,<br>Synthetic</div>
+        </div>
+
+        <!-- Arrow -->
+        <div style="flex:0 0 40px;display:flex;align-items:center;justify-content:center;padding-top:60px">
+          <div style="font-size:24px;color:var(--text-muted)">&#8594;</div>
+        </div>
+
+        <!-- Analysis Engines -->
+        <div style="flex:1">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;text-align:center">Analysis Engines</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="padding:12px;background:#E8F4FD;border:1px solid #B4D6F0;border-radius:6px">
+              <div style="font-size:12px;font-weight:700;color:var(--sf-blue-dark)">Conformance Checker</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px">Token-based replay<br>van der Aalst algorithms<br>Process model builder</div>
+            </div>
+            <div style="padding:12px;background:#FEF1EE;border:1px solid #F0B4B4;border-radius:6px">
+              <div style="font-size:12px;font-weight:700;color:#8B1A15">Temporal Analyzer</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px">Throughput times<br>Bottleneck detection<br>Delay probability</div>
+            </div>
+            <div style="padding:12px;background:#F3E8FF;border:1px solid #D4B4F0;border-radius:6px">
+              <div style="font-size:12px;font-weight:700;color:#6B21A8">Pattern Clustering</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px">TF-IDF + K-Means<br>Effect sizing (Cohen's d)<br>Stability bootstrap</div>
+            </div>
+            <div style="padding:12px;background:#FFF4EC;border:1px solid #F0D4B4;border-radius:6px">
+              <div style="font-size:12px;font-weight:700;color:#92400E">Cross-System Resolver</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px">Entity matching<br>Levenshtein + proximity<br>Gap detection</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arrow -->
+        <div style="flex:0 0 40px;display:flex;align-items:center;justify-content:center;padding-top:60px">
+          <div style="font-size:24px;color:var(--text-muted)">&#8594;</div>
+        </div>
+
+        <!-- Outputs -->
+        <div style="flex:0 0 160px">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:10px;text-align:center">Forensic Output</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="padding:8px 12px;background:var(--critical-bg);border:1px solid #E8A8A5;border-radius:6px;font-size:11px;font-weight:600;text-align:center;color:#8B1A15">Compliance<br>Violations</div>
+            <div style="padding:8px 12px;background:var(--high-bg);border:1px solid #F0D4B4;border-radius:6px;font-size:11px;font-weight:600;text-align:center;color:#92400E">Bottleneck<br>Reports</div>
+            <div style="padding:8px 12px;background:var(--medium-bg);border:1px solid #E8D48B;border-radius:6px;font-size:11px;font-weight:600;text-align:center;color:#7A6C1E">Pattern<br>Cards</div>
+            <div style="padding:8px 12px;background:#EEF6F0;border:1px solid #C8E6C9;border-radius:6px;font-size:11px;font-weight:600;text-align:center;color:#2E7D32">Evidence<br>Ledger</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Tech annotations -->
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:24px;justify-content:center;flex-wrap:wrap">
+        <div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">TypeScript (MCP Server)</div>
+        <div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">Python 3.11 (Pattern Engine)</div>
+        <div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">834 tests (602 TS + 232 Py)</div>
+        <div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">Deterministic (seed=42)</div>
+        <div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">Zero frontend dependencies</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analysis Tabs as clickable cards -->
+  <div class="section">
+    <div class="section-title">Four Forensic Lenses</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+
+      <div onclick="switchTab('crm')" style="cursor:pointer;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);transition:all 0.15s;border-top:4px solid var(--sf-blue)" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.12)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--sf-blue);margin-bottom:4px">8,800</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">CRM Pipeline Forensics</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.5">Sales opportunity analysis — win rates, velocity patterns, agent performance, quarter-end compression. Kaggle real-world CRM data.</div>
+        <div style="margin-top:12px;font-size:11px;color:var(--sf-blue);font-weight:600">Explore &#8594;</div>
+      </div>
+
+      <div onclick="switchTab('bpi')" style="cursor:pointer;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);transition:all 0.15s;border-top:4px solid var(--high)" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.12)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--high);margin-bottom:4px">251K</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">BPI Challenge 2019</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.5">Real purchase-to-pay from a multinational. 1.6M events, payment blocks, process variability, resource concentration risks.</div>
+        <div style="margin-top:12px;font-size:11px;color:var(--high);font-weight:600">Explore &#8594;</div>
+      </div>
+
+      <div onclick="switchTab('ides')" style="cursor:pointer;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);transition:all 0.15s;border-top:4px solid var(--critical)" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.12)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--critical);margin-bottom:4px">7</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">SAP IDES Compliance</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.5">Compliance violations in SAP's own demo system. Maverick buying, retroactive documentation, segregation of duties risks.</div>
+        <div style="margin-top:12px;font-size:11px;color:var(--critical);font-weight:600">Explore &#8594;</div>
+      </div>
+
+      <div onclick="switchTab('nlp')" style="cursor:pointer;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);transition:all 0.15s;border-top:4px solid #9050E9" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,0.12)'" onmouseout="this.style.boxShadow='var(--shadow-sm)'">
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:#9050E9;margin-bottom:4px">37K</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">NLP Pattern Analysis</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.5">Salesforce HERB communication mining — 37K messages clustered into patterns, network graphs, bridge users, team dynamics.</div>
+        <div style="margin-top:12px;font-size:11px;color:#9050E9;font-weight:600">Explore &#8594;</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Real-World Case Study -->
+  <div class="section">
+    <div class="section-title">Real-World Application — ERP User License Audit</div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)">
+
+      <!-- Case study header -->
+      <div style="padding:20px 24px;background:linear-gradient(135deg,#032D60,#0176D3);color:white">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;opacity:0.6;margin-bottom:4px">Client Case Study (Anonymized)</div>
+        <div style="font-size:20px;font-weight:700">Healthcare SaaS Company — NetSuite License Optimization</div>
+        <div style="font-size:12px;opacity:0.7;margin-top:4px">Automated user classification identified $103,896 in annual savings from a 289-user NetSuite environment</div>
+      </div>
+
+      <!-- Metrics row -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border)">
+        <div style="padding:20px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:28px;font-weight:800;font-family:var(--mono)">289</div>
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Total Users</div>
+        </div>
+        <div style="padding:20px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:var(--critical)">69</div>
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Eliminable</div>
+        </div>
+        <div style="padding:20px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:var(--low)">$103K</div>
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Annual Savings</div>
+        </div>
+        <div style="padding:20px;text-align:center;border-right:1px solid var(--border)">
+          <div style="font-size:28px;font-weight:800;font-family:var(--mono);color:var(--sf-blue)">14.4x</div>
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">ROI</div>
+        </div>
+        <div style="padding:20px;text-align:center">
+          <div style="font-size:28px;font-weight:800;font-family:var(--mono)">0.8</div>
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px">Month Payback</div>
+        </div>
+      </div>
+
+      <!-- Classification breakdown -->
+      <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+
+        <!-- Left: Category bars -->
+        <div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:16px">User Classification</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Employee Center (basic access)</span><span style="font-family:var(--mono);font-weight:600">241</span></div>
+              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
+                <div style="width:83.4%;height:100%;background:linear-gradient(90deg,#E8F4FD,var(--sf-blue));border-radius:4px;opacity:0.7"></div>
+                <div style="position:absolute;right:8px;top:2px;font-size:10px;font-family:var(--mono);color:var(--text-muted)">83.4%</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--low);font-weight:600">Essential Finance</span><span style="font-family:var(--mono);font-weight:600">22</span></div>
+              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
+                <div style="width:7.6%;height:100%;background:var(--low);border-radius:4px;opacity:0.7"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--medium);font-weight:600">Review Needed</span><span style="font-family:var(--mono);font-weight:600">12</span></div>
+              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
+                <div style="width:4.2%;height:100%;background:var(--medium);border-radius:4px;opacity:0.7"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--critical);font-weight:600">Estimated Dormant (full-access)</span><span style="font-family:var(--mono);font-weight:600">8</span></div>
+              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
+                <div style="width:2.8%;height:100%;background:var(--critical);border-radius:4px;opacity:0.7"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--high);font-weight:600">Integration Accounts</span><span style="font-family:var(--mono);font-weight:600">8</span></div>
+              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
+                <div style="width:2.8%;height:100%;background:var(--high);border-radius:4px;opacity:0.7"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:#9050E9;font-weight:600">Approval-Only (replaceable)</span><span style="font-family:var(--mono);font-weight:600">4</span></div>
+              <div style="height:20px;background:var(--bg);border-radius:4px;overflow:hidden;position:relative">
+                <div style="width:1.4%;height:100%;background:#9050E9;border-radius:4px;opacity:0.7"></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right: Savings breakdown -->
+        <div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:16px">Savings Breakdown</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+
+            <div style="padding:12px;background:var(--critical-bg);border-radius:6px;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:12px;font-weight:600">Dormant Full-Access Users</div>
+                <div style="font-size:10px;color:var(--text-muted);margin-top:2px">8 users at $5,808/yr — no login in 90+ days</div>
+              </div>
+              <div style="font-size:16px;font-weight:800;font-family:var(--mono);color:var(--critical)">$46,464</div>
+            </div>
+
+            <div style="padding:12px;background:var(--high-bg);border-radius:6px;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:12px;font-weight:600">Departed Employee Center Users</div>
+                <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Est. 53 departed at $600/yr — cross-ref HR</div>
+              </div>
+              <div style="font-size:16px;font-weight:800;font-family:var(--mono);color:var(--high)">$31,800</div>
+            </div>
+
+            <div style="padding:12px;background:#F3E8FF;border-radius:6px;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:12px;font-weight:600">Approval-Only Workflow Replacement</div>
+                <div style="font-size:10px;color:var(--text-muted);margin-top:2px">4 users replaced by SuiteFlow email approvals</div>
+              </div>
+              <div style="font-size:16px;font-weight:800;font-family:var(--mono);color:#9050E9">$23,232</div>
+            </div>
+
+            <div style="padding:12px;background:var(--medium-bg);border-radius:6px;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div style="font-size:12px;font-weight:600">Deprecated Integrations</div>
+                <div style="font-size:10px;color:var(--text-muted);margin-top:2px">Est. 4 of 8 integrations no longer active</div>
+              </div>
+              <div style="font-size:16px;font-weight:800;font-family:var(--mono);color:var(--medium)">$2,400</div>
+            </div>
+
+          </div>
+
+          <div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:6px;font-size:11px;color:var(--text-secondary);line-height:1.6">
+            <strong>Method:</strong> Automated classification engine analyzes NetSuite user roles, login timestamps, transaction history, and approval patterns. Each user is categorized with a confidence score and actionable recommendation. Implementation: 40 hours, $7,200. Conservative estimate: $57,432/yr.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Design Philosophy -->
+  <div class="section">
+    <div class="section-title">Design Principles</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">Adapter Pattern</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">Every data source implements <span style="font-family:var(--mono);background:var(--bg);padding:1px 6px;border-radius:3px;font-size:11px">IDataAdapter</span> — normalize once, analyze everywhere. Adding a new ERP means writing one adapter, not rewriting analysis logic. Currently: SAP, Salesforce, NetSuite, BPI (XES/OCEL), CSV, synthetic.</div>
+      </div>
+
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">Deterministic Reproducibility</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">All analysis uses <span style="font-family:var(--mono);background:var(--bg);padding:1px 6px;border-radius:3px;font-size:11px">seed=42</span>. Every pattern card, every cluster, every statistical test can be reproduced exactly. Run <span style="font-family:var(--mono);background:var(--bg);padding:1px 6px;border-radius:3px;font-size:11px">make demo</span> and get identical output. No non-determinism in the forensic chain.</div>
+      </div>
+
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">Evidence-Based Findings</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">Every claim links to an evidence ledger entry with source files, row counts, timestamps, and reproducibility parameters. Effect sizes use Cohen's d with 95% CI. Weak results are labeled as exploratory — no overclaiming.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- How AI Was Used -->
+  <div class="section">
+    <div class="section-title">How AI Was Used — Honest Accounting</div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+        <div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--sf-blue)">What I Did (Christopher Bailey)</div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+            &#8226; Defined the problem space and research questions<br>
+            &#8226; Selected data sources and licensed datasets<br>
+            &#8226; Designed the adapter architecture and analysis pipeline<br>
+            &#8226; Chose conformance algorithms (van der Aalst token replay)<br>
+            &#8226; Interpreted findings and wrote forensic narratives<br>
+            &#8226; Determined what's a real finding vs. a statistical artifact<br>
+            &#8226; Real-world client engagement and domain expertise (20 yrs ERP)
+          </div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:#9050E9">What Claude Code Did (AI Pair-Programmer)</div>
+          <div style="font-size:12px;color:var(--text-secondary);line-height:1.8">
+            &#8226; Implemented data adapters and parsers (TypeScript)<br>
+            &#8226; Built pattern engine and clustering pipeline (Python)<br>
+            &#8226; Wrote conformance checking engine<br>
+            &#8226; Generated test suites (834 tests)<br>
+            &#8226; Built this dashboard (vanilla HTML/CSS/JS)<br>
+            &#8226; Statistical computations (effect sizing, CI, p-values)<br>
+            &#8226; All code visible in <a href="https://github.com/chrbailey/SAP-Transaction-Forensics" style="color:#9050E9">git history</a> with co-author tags
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text-secondary);line-height:1.6">
+        <strong>The honest version:</strong> Claude Code is a force multiplier. The 834-test, 7-adapter, 4-engine system you see here was built in weeks, not months. But the AI doesn't know what's worth finding — it doesn't know that a PO-before-PR is a Sarbanes-Oxley risk, or that 22.7% payment block rates are 4x industry norms. Domain expertise decides what to look for; AI makes looking fast.
+      </div>
+    </div>
+  </div>
+
+  <!-- Source & Links -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">Data Sources</div>
+      <div style="font-size:12px;color:var(--text-secondary);line-height:2;font-family:var(--mono)">
+        Kaggle CRM Sales Opportunities — Apache 2.0<br>
+        BPI Challenge 2019 — 4TU.ResearchData, CC BY 4.0<br>
+        SAP IDES — sap-extractor, MIT License<br>
+        Salesforce HERB — HuggingFace, CC-BY-NC-4.0<br>
+        Client data — anonymized, used with permission
+      </div>
+    </div>
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">Reproduce This</div>
+      <div style="font-size:12px;color:var(--text-secondary);line-height:2;font-family:var(--mono)">
+        git clone github.com/chrbailey/SAP-Transaction-Forensics<br>
+        make demo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# one-command bootstrap<br>
+        make test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 834 tests<br>
+        make demo-kaggle&nbsp;# real Kaggle CRM data<br>
+        <a href="https://github.com/chrbailey/SAP-Transaction-Forensics" style="color:var(--sf-blue)">View on GitHub &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div>Christopher Bailey · Stanford TECH 41 — Building AI Products Through Rapid Prototyping · March 2026</div>
+  <div><a href="https://github.com/chrbailey/SAP-Transaction-Forensics" target="_blank">github.com/chrbailey/SAP-Transaction-Forensics</a></div>
+</footer>
+
+</div><!-- /tab-home -->
+
+<!-- ═══════════════════════════════════════════════
+     TAB 1: CRM Pipeline Forensics
+═══════════════════════════════════════════════ -->
+<div id="tab-crm" class="tab-panel">
 
 <div class="page">
 
@@ -1397,7 +1779,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 
 <script>
 // ─── Tab switching ───
-var TABS = ['crm', 'bpi', 'ides', 'nlp'];
+var TABS = ['home', 'crm', 'bpi', 'ides', 'nlp'];
 function switchTab(tab) {
   TABS.forEach(function(t) {
     document.getElementById('tab-' + t).classList.toggle('active', t === tab);
