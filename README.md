@@ -9,8 +9,8 @@ Automated process mining engine that combines ERP transaction logs with the unst
 [![Python](https://img.shields.io/badge/python-3.11-blue)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-> **Stanford TECH 41** — Building AI Products Through Rapid Prototyping
-> Christopher Bailey · March 2026
+> **ERP Access, Inc.** — Cross-System Process Forensics for ERP Audit, M&A Diligence, and Operational Investigations
+> Christopher Bailey · 2026
 
 ---
 
@@ -61,17 +61,26 @@ Three anonymized client engagements demonstrate the pattern:
 The forensic engine (in the [companion repo](https://github.com/chrbailey/SAP-Transaction-Forensics)) processes data through:
 
 ```
-Data Sources          Adapters (7)         Analysis Engines (4)       Output
-─────────────        ──────────────       ─────────────────────      ──────────
-SAP ERP (IDES)   →                    →   Conformance Checker    →   Compliance Violations
-Salesforce CRM   →   IDataAdapter     →   Temporal Analyzer      →   Bottleneck Reports
-BPI Challenge    →   (normalize to    →   Pattern Clustering     →   Pattern Cards
-Slack/HERB       →    unified event   →   Cross-System Resolver  →   Evidence Ledger
-NetSuite ERP     →    log)
-CSV / Custom     →
+Data Sources          Adapters (7)         Analysis Engines (4)       Evidence Systems (7)
+─────────────        ──────────────       ─────────────────────      ────────────────────
+SAP ERP (IDES)   →                    →   Conformance Checker    →   Contradiction Engine (12 types)
+Salesforce CRM   →   IDataAdapter     →   Temporal Analyzer      →   Schema Validator (438 fields)
+BPI Challenge    →   (normalize to    →   Pattern Clustering     →   Reality-Gap Detector (3-way)
+Slack/HERB       →    unified event   →   Cross-System Resolver  →   Finding Lifecycle (8-state)
+NetSuite ERP     →    log)                                       →   Reviewer Handoff Packets
+CSV / Custom     →                                               →   Field-Level Provenance (SHA-256)
+                                                                 →   MCP Tool Integration (11 tools)
 ```
 
-- **834 tests** (602 TypeScript + 232 Python)
+- **1,639 tests** across 70 test suites
+- **19 deterministic extraction paths** (SAP O2C, FI/CO, P2P + Salesforce + NetSuite)
+- **12-type contradiction engine** (AMOUNT_DIVERGENCE, TEMPORAL_IMPOSSIBILITY, SOD_VIOLATION, etc.)
+- **Field-level provenance** with SHA-256 replay verification
+- **Schema validator** with 19-table IDES reference (438 fields)
+- **Reality-gap detector** (3-way: reference vs documented vs actual)
+- **Finding lifecycle** (8-state machine: DETECTED through RESOLVED)
+- **Reviewer handoff packets** (self-contained audit artifacts)
+- **11 MCP tools** for agent integration
 - **Deterministic** — all analysis uses `seed=42`
 - **Reproducible** — `make demo` for one-command bootstrap
 
@@ -114,7 +123,7 @@ For the full forensic engine (conformance checking, data adapters, cross-system 
 git clone https://github.com/chrbailey/SAP-Transaction-Forensics.git
 cd SAP-Transaction-Forensics
 make demo    # one-command deterministic bootstrap
-make test    # 834 tests
+make test    # 1,639 tests
 ```
 
 ## Data Sources
@@ -134,7 +143,7 @@ make test    # 834 tests
 | Defined the problem space and research questions | Implemented data adapters and parsers (TypeScript) |
 | Selected data sources and licensed datasets | Built pattern engine and clustering pipeline (Python) |
 | Designed the adapter architecture and analysis pipeline | Wrote conformance checking engine |
-| Chose conformance algorithms (van der Aalst token replay) | Generated test suites (834 tests) |
+| Chose conformance algorithms (van der Aalst token replay) | Generated test suites (1,639 tests across 70 suites) |
 | Interpreted findings and wrote forensic narratives | Built the 6-tab dashboard (vanilla HTML/CSS/JS) |
 | Determined what's a real finding vs. a statistical artifact | Statistical computations (effect sizing, CI, p-values) |
 | Real-world client engagements and domain expertise (20 yrs ERP) | All code in git history with co-author tags |
@@ -144,7 +153,7 @@ Claude Code is a force multiplier. The AI doesn't know what's worth finding — 
 ## Author
 
 **Christopher Bailey**
-Stanford Continuing Studies — TECH 41: Building AI Products Through Rapid Prototyping
+ERP Access, Inc. — Cross-System Process Forensics
 GitHub: [@chrbailey](https://github.com/chrbailey)
 
 ## License

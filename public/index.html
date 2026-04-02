@@ -300,7 +300,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       <div class="header-icon">TF</div>
       <div>
         <div class="header-title">Transaction Forensics</div>
-        <div class="header-subtitle">Stanford TECH 41 — Christopher Bailey — Built with Claude Code (AI pair-programming)</div>
+        <div class="header-subtitle">ERP Access, Inc. — Christopher Bailey — Built with Claude Code (AI pair-programming)</div>
       </div>
     </div>
     <div class="header-tabs">
@@ -314,9 +314,9 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
     <div class="header-meta">
       <!-- Home stats -->
       <div id="meta-home" style="display:flex;gap:24px;align-items:center;">
-        <div class="header-stat"><div class="header-stat-value">834</div><div class="header-stat-label">Tests Passing</div></div>
-        <div class="header-stat"><div class="header-stat-value">7</div><div class="header-stat-label">Data Adapters</div></div>
-        <div class="header-stat"><div class="header-stat-value">4</div><div class="header-stat-label">Analysis Engines</div></div>
+        <div class="header-stat"><div class="header-stat-value">1,639</div><div class="header-stat-label">Tests Passing</div></div>
+        <div class="header-stat"><div class="header-stat-value">19</div><div class="header-stat-label">Extraction Paths</div></div>
+        <div class="header-stat"><div class="header-stat-value">11</div><div class="header-stat-label">MCP Tools</div></div>
       </div>
       <!-- CRM stats -->
       <div id="meta-crm" style="display:none;gap:24px;align-items:center;">
@@ -371,7 +371,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
   <div style="margin-bottom:40px">
     <div style="font-size:32px;font-weight:800;line-height:1.2;margin-bottom:12px">Structured data tells you <em>what</em> happened.<br><span style="color:var(--sf-blue)">Unstructured text tells you <em>why</em>.</span></div>
     <div style="font-size:15px;color:var(--text-secondary);line-height:1.7;max-width:800px">
-      Transaction Forensics is a process mining engine that combines ERP transaction logs with the unstructured text that surrounds them — emails, Slack messages, progress reports, call transcripts, and order notes — to surface the discrepancies between what organizations report and what actually happened. Built as a Stanford TECH 41 project.
+      Transaction Forensics is a cross-system process forensics platform that combines ERP transaction logs with the unstructured text that surrounds them — emails, Slack messages, progress reports, call transcripts, and order notes — to surface the discrepancies between what organizations report and what actually happened. Built by ERP Access, Inc.
     </div>
   </div>
 
@@ -560,7 +560,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:24px;justify-content:center;flex-wrap:wrap">
         <div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">TypeScript (MCP Server)</div>
         <div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">Python 3.11 (Pattern Engine)</div>
-        <div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">834 tests (602 TS + 232 Py)</div>
+        <div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">1,639 tests across 70 suites</div>
         <div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">Deterministic (seed=42)</div>
         <div style="font-size:10px;color:var(--text-muted);font-family:var(--mono)">Zero frontend dependencies</div>
       </div>
@@ -636,6 +636,62 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
     </div>
   </div>
 
+  <!-- Evidence Platform Capabilities -->
+  <div class="section">
+    <div class="section-title">Evidence Platform Capabilities</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px">
+
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);border-top:3px solid var(--critical)">
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--critical);margin-bottom:4px">12</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">Contradiction Types</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">AMOUNT_DIVERGENCE, TEMPORAL_IMPOSSIBILITY, SOD_VIOLATION, STATUS_CONTRADICTION, APPROVAL_BYPASS, DUPLICATE_PAYMENT, PHANTOM_VENDOR, RETROACTIVE_CHANGE, MISSING_RECEIPT, THRESHOLD_SPLIT, POLICY_OVERRIDE, GHOST_EMPLOYEE</div>
+      </div>
+
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);border-top:3px solid var(--sf-blue)">
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--sf-blue);margin-bottom:4px">19</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">Extraction Paths</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">Deterministic extraction across SAP O2C, FI/CO, P2P + Salesforce + NetSuite pipelines. Schema validator with 19-table IDES reference (438 fields). Reality-gap detector: 3-way comparison of reference vs documented vs actual.</div>
+      </div>
+
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm);border-top:3px solid var(--low)">
+        <div style="font-size:24px;font-weight:800;font-family:var(--mono);color:var(--low);margin-bottom:4px">8</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">Finding Lifecycle States</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">DETECTED &#8594; CONFIRMED &#8594; ASSIGNED &#8594; INVESTIGATING &#8594; ESCALATED &#8594; REMEDIATED &#8594; VERIFIED &#8594; RESOLVED. Field-level provenance with SHA-256 replay verification. Reviewer handoff packets as self-contained audit artifacts.</div>
+      </div>
+
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">7 Evidence Systems</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.8;font-family:var(--mono)">
+          Contradiction Engine (12 types)<br>
+          Schema Validator (438 IDES fields)<br>
+          Reality-Gap Detector (3-way diff)<br>
+          Finding Lifecycle (8-state machine)<br>
+          Reviewer Handoff Packets<br>
+          Field-Level Provenance (SHA-256)<br>
+          MCP Tool Integration (11 tools)
+        </div>
+      </div>
+
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-sm)">
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">Platform Stats</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.8;font-family:var(--mono)">
+          1,639 tests across 70 test suites<br>
+          7 data adapters + 7 evidence systems<br>
+          19 deterministic extraction paths<br>
+          12-type contradiction engine<br>
+          19-table IDES schema reference<br>
+          11 MCP tools for agent integration<br>
+          TypeScript + Python 3.11
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- How AI Was Used -->
   <div class="section">
     <div class="section-title">How AI Was Used — Honest Accounting</div>
@@ -659,7 +715,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
             &#8226; Implemented data adapters and parsers (TypeScript)<br>
             &#8226; Built pattern engine and clustering pipeline (Python)<br>
             &#8226; Wrote conformance checking engine<br>
-            &#8226; Generated test suites (834 tests)<br>
+            &#8226; Generated test suites (1,639 tests across 70 suites)<br>
             &#8226; Built this dashboard (vanilla HTML/CSS/JS)<br>
             &#8226; Statistical computations (effect sizing, CI, p-values)<br>
             &#8226; All code visible in <a href="https://github.com/chrbailey/SAP-Transaction-Forensics" style="color:#9050E9">git history</a> with co-author tags
@@ -667,7 +723,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
         </div>
       </div>
       <div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text-secondary);line-height:1.6">
-        <strong>The honest version:</strong> Claude Code is a force multiplier. The 834-test, 7-adapter, 4-engine system you see here was built in weeks, not months. But the AI doesn't know what's worth finding — it doesn't know that a PO-before-PR is a Sarbanes-Oxley risk, or that 22.7% payment block rates are 4x industry norms. Domain expertise decides what to look for; AI makes looking fast.
+        <strong>The honest version:</strong> Claude Code is a force multiplier. The 1,639-test, 7-adapter, 7-evidence-system platform you see here was built in weeks, not months. But the AI doesn't know what's worth finding — it doesn't know that a PO-before-PR is a Sarbanes-Oxley risk, or that 22.7% payment block rates are 4x industry norms. Domain expertise decides what to look for; AI makes looking fast.
       </div>
     </div>
   </div>
@@ -689,7 +745,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       <div style="font-size:12px;color:var(--text-secondary);line-height:2;font-family:var(--mono)">
         git clone github.com/chrbailey/SAP-Transaction-Forensics<br>
         make demo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# one-command bootstrap<br>
-        make test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 834 tests<br>
+        make test&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# 1,639 tests<br>
         make demo-kaggle&nbsp;# real Kaggle CRM data<br>
         <a href="https://github.com/chrbailey/SAP-Transaction-Forensics" style="color:var(--sf-blue)">View on GitHub &#8594;</a>
       </div>
@@ -699,7 +755,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 </div>
 
 <footer class="footer">
-  <div>Christopher Bailey · Stanford TECH 41 — Building AI Products Through Rapid Prototyping · March 2026</div>
+  <div>Christopher Bailey · ERP Access, Inc. — Cross-System Process Forensics · 2026</div>
   <div><a href="https://github.com/chrbailey/SAP-Transaction-Forensics" target="_blank">github.com/chrbailey/SAP-Transaction-Forensics</a></div>
 </footer>
 
@@ -1251,11 +1307,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
       <div style="margin-top:20px;padding:16px;background:#F0EDFF;border-radius:8px;border-left:3px solid #9050E9">
         <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#9050E9">Technology Stack</div>
         <div style="font-size:12px;font-family:var(--mono);color:var(--text-secondary);line-height:2">
-          MCP Server: TypeScript (ESM, strict mode), 7 data adapters<br>
+          MCP Server: TypeScript (ESM, strict mode), 7 data adapters + 7 evidence systems<br>
           Pattern Engine: Python 3.11, scikit-learn, scipy<br>
           Conformance: Token-based replay, ProcessModelBuilder, van der Aalst algorithms<br>
           Cross-System: Entity resolver (Levenshtein + proximity), unified event log<br>
-          Tests: 834 passing (602 TypeScript + 232 Python)<br>
+          Evidence: 12-type contradiction engine, SHA-256 provenance, 8-state finding lifecycle<br>
+          Tests: 1,639 passing across 70 test suites<br>
           Data: Kaggle CRM Sales Opportunities (Apache 2.0 license)<br>
           Frontend: Vanilla HTML/CSS/JS (zero dependencies)<br>
           Deployment: Vercel (static)<br>
@@ -1269,7 +1326,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 
 <footer class="footer">
   <div>
-    Christopher Bailey · Stanford TECH 41 · Data: <a href="https://www.kaggle.com/datasets/innocentmfa/crm-sales-opportunities" target="_blank">Kaggle CRM Sales Opportunities (8,800 records, Apache 2.0)</a>
+    Christopher Bailey · ERP Access, Inc. · Data: <a href="https://www.kaggle.com/datasets/innocentmfa/crm-sales-opportunities" target="_blank">Kaggle CRM Sales Opportunities (8,800 records, Apache 2.0)</a>
   </div>
   <div><a href="https://github.com/chrbailey/SAP-Transaction-Forensics" target="_blank">github.com/chrbailey/SAP-Transaction-Forensics</a> · March 2026</div>
 </footer>
@@ -1346,7 +1403,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
     <strong>Christopher Bailey</strong> · Pattern Engine v3.0 · Data: <a href="https://huggingface.co/datasets/Salesforce/HERB" target="_blank">Salesforce/HERB (HuggingFace, CC-BY-NC-4.0)</a>
     · Pipeline: Python + scikit-learn (TF-IDF + KMeans)
   </div>
-  <div>Stanford TECH 41 — Building AI Products Through Rapid Prototyping · March 2026</div>
+  <div>ERP Access, Inc. — Cross-System Process Forensics · 2026</div>
 </footer>
 
 </div><!-- /tab-nlp -->
@@ -1539,7 +1596,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 </div>
 
 <footer class="footer">
-  <div>Christopher Bailey · Stanford TECH 41 · Data: BPI Challenge 2019 (4TU.ResearchData, CC BY 4.0)</div>
+  <div>Christopher Bailey · ERP Access, Inc. · Data: BPI Challenge 2019 (4TU.ResearchData, CC BY 4.0)</div>
   <div><a href="https://github.com/chrbailey/SAP-Transaction-Forensics" target="_blank">github.com/chrbailey/SAP-Transaction-Forensics</a> · March 2026</div>
 </footer>
 
@@ -1738,7 +1795,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
         Data Adapters: BPI (XES/OCEL), SAP IDES (sap-extractor, MIT), Synthetic (seed=42)<br>
         Pattern Engine: Python 3.11, scikit-learn, scipy (TF-IDF + K-Means + effect sizing)<br>
         Temporal Analysis: Throughput time, bottleneck detection, delay probability<br>
-        Tests: 834 passing (602 TypeScript + 232 Python)<br>
+        Tests: 1,639 passing across 70 test suites<br>
         Source: <a href="https://github.com/chrbailey/SAP-Transaction-Forensics" style="color:var(--sf-blue)">github.com/chrbailey/SAP-Transaction-Forensics</a>
       </div>
     </div>
@@ -1747,7 +1804,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 </div>
 
 <footer class="footer">
-  <div>Christopher Bailey · Stanford TECH 41 · Data: SAP IDES Demo System (MIT via sap-extractor) + BPI Challenge 2019 (CC BY 4.0)</div>
+  <div>Christopher Bailey · ERP Access, Inc. · Data: SAP IDES Demo System (MIT via sap-extractor) + BPI Challenge 2019 (CC BY 4.0)</div>
   <div><a href="https://github.com/chrbailey/SAP-Transaction-Forensics" target="_blank">github.com/chrbailey/SAP-Transaction-Forensics</a> · March 2026</div>
 </footer>
 
@@ -2132,7 +2189,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); -web
 </div>
 
 <footer class="footer">
-  <div>Christopher Bailey · Stanford TECH 41 · Client data anonymized, used with permission</div>
+  <div>Christopher Bailey · ERP Access, Inc. · Client data anonymized, used with permission</div>
   <div><a href="https://github.com/chrbailey/SAP-Transaction-Forensics" target="_blank">github.com/chrbailey/SAP-Transaction-Forensics</a> · March 2026</div>
 </footer>
 
