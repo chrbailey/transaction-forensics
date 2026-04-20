@@ -1,13 +1,19 @@
 # Transaction Forensics
 
+> **Status: ARCHIVED — superseded by [chrbailey/SAP-Transaction-Forensics](https://github.com/chrbailey/SAP-Transaction-Forensics).**
+> See [ARCHIVED.md](ARCHIVED.md). Active development moved to the successor repo in Q1 2026: 1,663 tests, 23 MCP tools, 7 evidence systems, 12-category contradiction engine, Worker/Critic/Ralph pattern-discovery loop. This repo is read-only; the Vercel demo is preserved.
+
+---
+
 **Structured data tells you what happened. Unstructured text tells you why.**
 
 Automated process mining engine that combines ERP transaction logs with the unstructured text that surrounds them — emails, Slack messages, help desk tickets, progress reports, and order notes — to surface discrepancies between what organizations report and what actually happened.
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://transaction-forensics.vercel.app)
-[![Companion Repo](https://img.shields.io/badge/engine-SAP--Transaction--Forensics-blue)](https://github.com/chrbailey/SAP-Transaction-Forensics)
+[![Successor Repo](https://img.shields.io/badge/successor-SAP--Transaction--Forensics-blue)](https://github.com/chrbailey/SAP-Transaction-Forensics)
 [![Python](https://img.shields.io/badge/python-3.11-blue)](https://python.org)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Status](https://img.shields.io/badge/status-archived-lightgrey)](./ARCHIVED.md)
 
 > **ERP Access, Inc.** — Cross-System Process Forensics for ERP Audit, M&A Diligence, and Operational Investigations
 > Christopher Bailey · 2026
